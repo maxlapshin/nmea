@@ -1,7 +1,7 @@
 #line 1 "nmea.rl"
 #include "nmea_parser.h"
 
-#line 80 "nmea.rl"
+#line 82 "nmea.rl"
 
 
 
@@ -312,12 +312,11 @@ static const int NMEA_start = 1;
 
 static const int NMEA_error = 0;
 
-#line 84 "nmea.rl"
+#line 86 "nmea.rl"
 
 
-void nmea_scanner(reader_function reader, void *user_data, read_rmc_function read_rmc) {
-	char *p, *pe;
-	char buffer[1024];
+void nmea_scanner(char *p, read_rmc_function read_rmc, void *rmc_user_data) {
+	char *pe;
 	int cs;
 	
 	int line_counter = 0, curline = 0;
@@ -332,18 +331,16 @@ void nmea_scanner(reader_function reader, void *user_data, read_rmc_function rea
 	int rmc_valid = 0;
 	
 	
-#line 336 "../ext/nmea.c"
+#line 335 "../ext/nmea.c"
 	{
 	cs = NMEA_start;
 	}
-#line 103 "nmea.rl"
+#line 104 "nmea.rl"
 	angle_value latitude, longitude;
 	
-	while(reader(buffer, sizeof(buffer), user_data)) {
-		p = buffer;
-		pe = p + strlen(p);
-		
-#line 347 "../ext/nmea.c"
+	pe = p + strlen(p);
+	
+#line 344 "../ext/nmea.c"
 	{
 	int _klen;
 	unsigned int _trans;
@@ -543,13 +540,15 @@ _match:
 		t.tm_mon = utc_month;
 		t.tm_year = utc_year;
 		t.tm_gmtoff = 0;
-		if(rmc_valid) {
-			read_rmc(latitude, longitude, t);
-		}
 		rmc_count++;
+		if(rmc_valid) {
+			read_rmc(latitude, longitude, t, rmc_user_data);
+		} else {
+			printf("invalid RMC %d\n", rmc_count);
+		}
 	}
 	break;
-#line 553 "../ext/nmea.c"
+#line 552 "../ext/nmea.c"
 		}
 	}
 
@@ -558,11 +557,9 @@ _again:
 		goto _resume;
 	_out: {}
 	}
-#line 109 "nmea.rl"
-		if(cs == NMEA_error) {
-			printf("PARSE ERROR on line %d\n", line_counter);
-			break;
-		}
+#line 108 "nmea.rl"
+	if(cs == NMEA_error) {
+		printf("PARSE ERROR on line %d: '%s'\n", line_counter, p);
 	}
 }
 

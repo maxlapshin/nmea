@@ -1,13 +1,16 @@
 #include "nmea_parser.h"
 
 
-void read_rmc(angle_value latitude, angle_value longitude, struct tm current_time) {
+void read_rmc(angle_value latitude, angle_value longitude, struct tm current_time, void *user_data) {
 	printf("Coord: %d %.0fN  %d %.0fE\n", latitude.degrees, latitude.minutes, longitude.degrees, longitude.minutes);
 }
 
 
 int main(void) {
 	FILE *f = fopen("log.txt", "r");
+	char buffer[1024];
 	
-	nmea_scanner((reader_function)fgets, (void *)f, read_rmc);
+	while(fgets(buffer, sizeof(buffer), f)) {
+		nmea_scanner(buffer, read_rmc, NULL);
+	}
 }

@@ -68,10 +68,12 @@
 		t.tm_mon = utc_month;
 		t.tm_year = utc_year;
 		t.tm_gmtoff = 0;
-		if(rmc_valid) {
-			read_rmc(latitude, longitude, t);
-		}
 		rmc_count++;
+		if(rmc_valid) {
+			read_rmc(latitude, longitude, t, rmc_user_data);
+		} else {
+			printf("invalid RMC %d\n", rmc_count);
+		}
 	}
 	rmc = "$GPRMC" comma utc_time comma rmc_state comma latitude comma longitude comma knot_speed comma course comma utc_date comma magnetic_variation checksum;
 #	gga = "$GPGGA" comma utc_time comma latitude comma longitude comma
@@ -83,9 +85,8 @@
 %% write data nofinal;
 
 
-void nmea_scanner(reader_function reader, void *user_data, read_rmc_function read_rmc) {
-	char *p, *pe;
-	char buffer[1024];
+void nmea_scanner(char *p, read_rmc_function read_rmc, void *rmc_user_data) {
+	char *pe;
 	int cs;
 	
 	int line_counter = 0, curline = 0;
@@ -102,14 +103,10 @@ void nmea_scanner(reader_function reader, void *user_data, read_rmc_function rea
 	%% write init;
 	angle_value latitude, longitude;
 	
-	while(reader(buffer, sizeof(buffer), user_data)) {
-		p = buffer;
-		pe = p + strlen(p);
-		%% write exec;
-		if(cs == NMEA_error) {
-			printf("PARSE ERROR on line %d\n", line_counter);
-			break;
-		}
+	pe = p + strlen(p);
+	%% write exec;
+	if(cs == NMEA_error) {
+		printf("PARSE ERROR on line %d: '%s'\n", line_counter, p);
 	}
 }
 
