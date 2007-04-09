@@ -1,7 +1,7 @@
 #include "nmea_parser.h"
 
 
-void read_rmc(angle_value latitude, angle_value longitude, struct tm current_time, void *user_data) {
+void read_rmc(angle_value latitude, angle_value longitude, struct tm current_time, time_t usec, void *user_data) {
 	printf("Coord: %d %.0fN  %d %.0fE\n", latitude.degrees, latitude.minutes, longitude.degrees, longitude.minutes);
 }
 

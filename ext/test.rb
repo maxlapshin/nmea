@@ -1,12 +1,25 @@
 #!/usr/bin/env ruby
+require 'rubygems'
+require 'rutils'
 require 'serialport'
 require 'nmea'
 
-@sp = SerialPort.new("/dev/tty.usbserial", 4800, 8, 1, SerialPort::NONE)
 
 class NMEAHandler
-  def rmc(latitude, longitude)
-    puts "#{latitude} #{longitude}"
+  def initialize
+    @rmc = []
+  end
+  def rmc(latitude, longitude, time)
+    line = "#{latitude.to_degrees rescue "nil"}, #{longitude.to_degrees rescue "nil"}, #{@rmc.empty? ? "1" : "0"}, -777.0, 39181.2648590, #{time.strftime("%d-%b-%y, %H:%M:%S")}"
+    File.open("t.plt", "a+") do |f|
+      @rmc << line
+      f << line + "\n"
+    end
+    puts line
+  end
+  
+  def gsv(satellites)
+    puts "Satellites: #{satellites}"
   end
 end
 
@@ -16,6 +29,10 @@ module GPS
   class AngleValue
     def to_s
       "%d %.4f%s" % [degrees.abs, minutes, symbol]
+    end
+    
+    def to_degrees
+      "%.6f" % [degrees + minutes/60]
     end
   end
   
@@ -31,9 +48,41 @@ module GPS
   end
 end
 
+class SerialPort
+  def self.try_open(port, *params)
+    begin
+      sp = create(port)
+      sp.set_modem_params(*params)
+      return sp
+    rescue StandardError => e
+      puts e
+      sleep 2
+      retry
+    end
+  end
+  
+  def self.try_gets(*params)
+    begin
+      @sp ||= try_open(*params)
+      return @sp.gets
+    rescue
+      @sp = nil
+      retry
+    end
+  end
+end
 
 @handler = NMEAHandler.new
+@f = File.open("log.txt")
 loop do
-  NMEA.scan(@sp.gets, NMEAHandler.new)
+  #sentence = SerialPort.try_gets("/dev/tty.usbserial", 4800, 8, 1, SerialPort::NONE)
+  sentence = @f.gets
+  break unless sentence
+  puts sentence if sentence =~ /\$GPGSV/
+  begin
+    NMEA.scan(sentence, NMEAHandler.new)
+  rescue NMEA::NMEAError => e
+    puts "Parse error"
+  end
 end
 

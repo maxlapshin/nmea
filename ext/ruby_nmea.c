@@ -1,11 +1,9 @@
-#include <ruby.h>
-#include <rubyio.h>
-#include "nmea_parser.h"
+#include "nmea.h"
 
-VALUE mGPS, mNMEA, cLatitude, cLongitude;
-ID id_GPS, id_Latitude, id_Longitude, id_new, id_rmc;
+VALUE mGPS, mNMEA, cLatitude, cLongitude, cTime, eNMEAError, cSatelliteInfo;
+ID id_GPS, id_Latitude, id_Longitude, id_new, id_rmc, id_gsv;
 
-static int load_constants() {
+int load_constants() {
 	if(!rb_const_defined(rb_cObject, id_GPS)) return 0;
 	mGPS = rb_const_get(rb_cObject, rb_intern("GPS"));
 	if(!rb_const_defined(mGPS, id_Latitude)) return 0;
@@ -15,20 +13,11 @@ static int load_constants() {
 	return 1;
 }
 
-static void rmc_reader(angle_value latitude, angle_value longitude, struct tm current_time, void *user_data) {
-	VALUE rmc_handler = (VALUE)user_data;
-	VALUE _lat, _long;
-	if(!load_constants()) return;
-	_lat = rb_funcall(cLatitude, id_new, 2, INT2FIX(latitude.degrees), rb_float_new(latitude.minutes));
-	_long = rb_funcall(cLongitude, id_new, 2, INT2FIX(longitude.degrees), rb_float_new(longitude.minutes));
-	rb_funcall(rmc_handler, id_rmc, 2, _lat, _long);
-}
-
 static VALUE scan(VALUE self, VALUE sentence, VALUE handler) {
-	nmea_scanner(RSTRING(sentence)->ptr, rmc_reader, handler);
+	Check_Type(sentence, T_STRING);
+	nmea_scanner(RSTRING(sentence)->ptr, handler);
 	return Qnil;
 }
-
 
 void Init_nmea() {
 	id_GPS = rb_intern("GPS");
@@ -36,8 +25,13 @@ void Init_nmea() {
 	id_Longitude = rb_intern("Longitude");
 	id_new = rb_intern("new");
 	id_rmc = rb_intern("rmc");
+	id_gsv = rb_intern("gsv");
 	cLatitude = Qnil;
 	cLongitude = Qnil;
+	cTime = rb_const_get(rb_cObject, rb_intern("Time"));
 	mNMEA = rb_define_module("NMEA");
 	rb_define_singleton_method(mNMEA, "scan", scan, 2);
+	eNMEAError = rb_define_class_under(mNMEA, "NMEAError", rb_eStandardError);
+	cSatelliteInfo = rb_struct_define(NULL, "number", "elevation", "azimuth", "signal_level", NULL);
+	rb_define_const(mNMEA, "SatelliteInfo", cSatelliteInfo);
 }

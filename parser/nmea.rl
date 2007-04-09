@@ -1,4 +1,4 @@
-#include "nmea_parser.h"
+#include "nmea.h"
 
 %%{
 	machine NMEA;
@@ -22,14 +22,13 @@
 	}
 	bcd = digit @{bcd = 10*(fc - '0');} digit @{bcd += fc - '0';};
 	b3cd = bcd digit @{bcd = bcd*10 + (fc - '0');};
-	number = ((digit @add_digit)+ ("." @switch_to_float) (digit @add_digit_after_comma)+);
+	integer = (digit @add_digit)+ ;
+	number = integer ("." @switch_to_float) (digit @add_digit_after_comma)+;
 	
 # $GPRMC,072458.748,V,,,,,,,080407,,*23
 # $GPRMC,072644.711,A,5546.5275,N,03741.2278,E,0.00,,080407,,*1B
-	utc_time = bcd @{ utc_hours = bcd; } bcd @{ utc_minutes = bcd;} number @{ utc_seconds = current_float; current_float = 0;};
-	utc_date = bcd @{ utc_day = bcd; } bcd @{ utc_month = bcd;} bcd @{ utc_year = bcd;};
-	
-	rmc_state = "A" @{rmc_valid = 1;} | "V" @{rmc_valid = 0;};
+	utc_time = bcd @{ utc_hours = bcd; } bcd @{ utc_minutes = bcd;} bcd @{ utc_seconds = bcd; } "." b3cd @{ utc_useconds = bcd;} comma;
+	utc_date = bcd @{ utc_day = bcd; } bcd @{ utc_month = bcd-1;} bcd @{ utc_year = 100+bcd;};
 	
 	action set_degrees {
 		current_degrees = bcd;
@@ -43,7 +42,7 @@
 		current_float = 0;
 		current_degrees = 0;
 	}
-	latitude = bcd @set_degrees number comma northing @set_latitude | comma;
+	latitude = (bcd @set_degrees number comma northing @set_latitude | comma) comma;
 	
 	easting = "E" | "W" @{current_degrees *= -1;};
 	action set_longitude {
@@ -52,32 +51,17 @@
 		current_degrees = 0;
 		current_float = 0;
 	}
-	longitude = b3cd @set_degrees number comma easting @set_longitude| comma;
+	longitude = (b3cd @set_degrees number comma easting @set_longitude| comma) comma;
 	
-	knot_speed = number @{current_float = 0;} | zlen;
-	course = number @{current_float = 0;} | zlen;
+	knot_speed = (number @{current_float = 0;} | zlen) comma;
+	course = (number @{current_float = 0;} | zlen) comma;
 	magnetic_variation = number @{current_float = 0;} comma easting | comma;
 	checksum = nmea_char+;
+
+	include "rmc.rl";
+	include "gsv.rl";
 	
-	action read_rmc {
-		struct tm t;
-		t.tm_sec = utc_seconds;
-		t.tm_min = utc_minutes;
-		t.tm_hour = utc_hours;
-		t.tm_mday = utc_day;
-		t.tm_mon = utc_month;
-		t.tm_year = utc_year;
-		t.tm_gmtoff = 0;
-		rmc_count++;
-		if(rmc_valid) {
-			read_rmc(latitude, longitude, t, rmc_user_data);
-		} else {
-			printf("invalid RMC %d\n", rmc_count);
-		}
-	}
-	rmc = "$GPRMC" comma utc_time comma rmc_state comma latitude comma longitude comma knot_speed comma course comma utc_date comma magnetic_variation checksum;
-#	gga = "$GPGGA" comma utc_time comma latitude comma longitude comma
-	sentence = rmc newline @read_rmc | nmea_char+ newline;
+	sentence = rmc newline @read_rmc | gsv newline @flush_gsv | nmea_char+ newline;
 	main := sentence+;
 }%%
 
@@ -85,20 +69,24 @@
 %% write data nofinal;
 
 
-void nmea_scanner(char *p, read_rmc_function read_rmc, void *rmc_user_data) {
+void nmea_scanner(char *p, VALUE handler) {
 	char *pe;
 	int cs;
 	
 	int line_counter = 0, curline = 0;
-	int rmc_count = 0;
 	int current_digit = 0, current_frac = 0;
 	double current_float = 0;
 	int current_degrees = 0;
 	double current_minutes = 0.0;
 	int bcd = 0;
-	int utc_hours, utc_minutes, utc_seconds;
-	int utc_day, utc_month, utc_year;
+	int utc_hours, utc_minutes;
+	int utc_day, utc_month, utc_year, utc_seconds, utc_useconds;
+	
 	int rmc_valid = 0;
+	
+	
+	static VALUE satellites = Qnil;
+	int total_gsv_number, current_gsv_number, total_satellites, satellite_number, elevation, azimuth, snr_db;
 	
 	%% write init;
 	angle_value latitude, longitude;
@@ -106,7 +94,7 @@ void nmea_scanner(char *p, read_rmc_function read_rmc, void *rmc_user_data) {
 	pe = p + strlen(p);
 	%% write exec;
 	if(cs == NMEA_error) {
-		printf("PARSE ERROR on line %d: '%s'\n", line_counter, p);
+		rb_raise(eNMEAError, "PARSE ERROR on line %d: '%s'\n", line_counter, p);
 	}
 }
 
