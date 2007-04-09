@@ -22,6 +22,7 @@
 	}
 	bcd = digit @{bcd = 10*(fc - '0');} digit @{bcd += fc - '0';};
 	b3cd = bcd digit @{bcd = bcd*10 + (fc - '0');};
+	b4cd = b3cd digit @{bcd = bcd*10 + (fc - '0');};
 	integer = (digit @add_digit)+ ;
 	number = integer ("." @switch_to_float) (digit @add_digit_after_comma)+;
 	
@@ -60,8 +61,10 @@
 
 	include "rmc.rl";
 	include "gsv.rl";
+	include "gsa.rl";
+	include "gga.rl";
 	
-	sentence = rmc newline @read_rmc | gsv newline @flush_gsv | nmea_char+ newline;
+	sentence = rmc newline @read_rmc | gsv newline @read_gsv | gsa newline @read_gsa | gga newline @read_gga;
 	main := sentence+;
 }%%
 
@@ -81,12 +84,20 @@ void nmea_scanner(char *p, VALUE handler) {
 	int bcd = 0;
 	int utc_hours, utc_minutes;
 	int utc_day, utc_month, utc_year, utc_seconds, utc_useconds;
-	
+	//RMC
 	int rmc_valid = 0;
-	
-	
+	//GSV
 	static VALUE satellites = Qnil;
 	int total_gsv_number, current_gsv_number, total_satellites, satellite_number, elevation, azimuth, snr_db;
+	//GSA
+	int gsa_manual, gsa_mode, gsa_prn_index;
+	double gsa_pdop, gsa_hdop, gsa_vdop;
+	VALUE gsa_prns[12];
+	//GGA
+	int gps_quality, active_satellite_count, dgps_station_id;
+	double altitude, geoidal_height, dgps_data_age;
+	char altitude_units, geoidal_height_units;
+	
 	
 	%% write init;
 	angle_value latitude, longitude;

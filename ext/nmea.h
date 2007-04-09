@@ -6,6 +6,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include <time.h>
+#include <math.h>
 
 typedef struct {
 	int degrees;
@@ -13,7 +14,8 @@ typedef struct {
 } angle_value;
 
 extern VALUE mGPS, mNMEA, cLatitude, cLongitude, cTime, eNMEAError, cSatelliteInfo;
-extern ID id_GPS, id_Latitude, id_Longitude, id_new, id_rmc, id_gsv;
+extern ID id_GPS, id_Latitude, id_Longitude, id_new, id_rmc, id_gsv, id_gsa, id_gga;
+
 
 int load_constants();
 void nmea_scanner(char *buffer, VALUE handler);

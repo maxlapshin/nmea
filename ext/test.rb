@@ -19,7 +19,15 @@ class NMEAHandler
   end
   
   def gsv(satellites)
-    puts "Satellites: #{satellites}"
+    puts "Satellites"
+  end
+  
+  def gsa(mode_state, mode, satellites, pdop, hdop, vdop)
+#    puts "GSA: #{mode_state},#{mode},#{satellites.inspect},#{pdop},#{hdop},#{vdop}"
+  end
+  
+  def gga(time, latitude, longitude, gps_quality, active_satellite_count, gsa_hdop, altitude, geoidal_height, dgps_data_age, dgps_station_id)
+    puts "GGA: #{time}, #{latitude}, #{longitude}, #{gps_quality}, #{active_satellite_count}, #{gsa_hdop}, #{altitude}, #{geoidal_height}, #{dgps_data_age}, #{dgps_station_id}"
   end
 end
 
@@ -78,11 +86,11 @@ loop do
   #sentence = SerialPort.try_gets("/dev/tty.usbserial", 4800, 8, 1, SerialPort::NONE)
   sentence = @f.gets
   break unless sentence
-  puts sentence if sentence =~ /\$GPGSV/
+  #puts sentence if sentence =~ /\$GPGGA/
   begin
     NMEA.scan(sentence, NMEAHandler.new)
   rescue NMEA::NMEAError => e
-    puts "Parse error"
+    puts "Parse error: '#{sentence}'"
   end
 end
 

@@ -1,7 +1,7 @@
 #include "nmea.h"
 
 VALUE mGPS, mNMEA, cLatitude, cLongitude, cTime, eNMEAError, cSatelliteInfo;
-ID id_GPS, id_Latitude, id_Longitude, id_new, id_rmc, id_gsv;
+ID id_GPS, id_Latitude, id_Longitude, id_new, id_rmc, id_gsv, id_gsa, id_gga;
 
 int load_constants() {
 	if(!rb_const_defined(rb_cObject, id_GPS)) return 0;
@@ -26,6 +26,8 @@ void Init_nmea() {
 	id_new = rb_intern("new");
 	id_rmc = rb_intern("rmc");
 	id_gsv = rb_intern("gsv");
+	id_gsa = rb_intern("gsa");
+	id_gga = rb_intern("gga");
 	cLatitude = Qnil;
 	cLongitude = Qnil;
 	cTime = rb_const_get(rb_cObject, rb_intern("Time"));

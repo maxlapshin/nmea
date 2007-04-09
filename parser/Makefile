@@ -1,4 +1,4 @@
-../ext/nmea.c: nmea.rl gsv.rl rmc.rl
+../ext/nmea.c: nmea.rl gsv.rl rmc.rl gsa.rl gga.rl
 	ragel nmea.rl | rlgen-cd -o ../ext/nmea.c
 	
 clean:

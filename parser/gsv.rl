@@ -16,18 +16,20 @@
 	elevation = integer comma @{elevation = current_digit; current_digit = 0;};
 	azimuth = integer comma @{azimuth = current_digit; current_digit = 0;};
 	snr_db = (integer | zlen) comma @{snr_db = current_digit; current_digit = 0;};
-	action read_gsv {
+	action append_gsv {
 		VALUE satellite = rb_funcall(cSatelliteInfo, id_new, 4, INT2FIX(satellite_number), INT2FIX(elevation), INT2FIX(azimuth), INT2FIX(snr_db));
 		rb_ary_push(satellites, satellite);
 	}
-	action flush_gsv {
+	action read_gsv {
 		if(current_gsv_number == total_gsv_number) {
-			rb_funcall(handler, id_gsv, 1, satellites);
+			if(rb_respond_to(handler, id_gsv)) {
+				rb_funcall(handler, id_gsv, 1, satellites);
+			}
 			rb_gc_unregister_address(&satellites);
 			satellites = Qnil;
 		}
 	}
-	sv_info = sv_prn_number elevation azimuth snr_db @read_gsv;	
+	sv_info = sv_prn_number elevation azimuth snr_db @append_gsv;	
 	gsv = "$GPGSV" comma total_gsv_number message_number total_satellites sv_info+ checksum;
 }%%
 
