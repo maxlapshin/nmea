@@ -98,4 +98,48 @@ class TestScanLines < Test::Unit::TestCase
     assert_equal 10.6, @hdop
     assert_equal 1.0, @vdop
   end
+  
+  def gga(time, latitude, longitude, gps_quality, active_satellite_count, hdop, altitude, geoidal_height, dgps_data_age, dgps_station_id)
+    @gga_called = (@gga_called || 0) + 1
+    @time = time
+    @latitude = latitude
+    @longitude = longitude
+    @gps_quality = gps_quality
+    @active_satellite_count = active_satellite_count
+    @hdop = hdop
+    @altitude = altitude
+    @geoidal_height = geoidal_height
+    @dgps_data_age = dgps_data_age
+    @dgps_station_id = dgps_station_id
+  end
+  
+  def test_gga
+    empty_gga = "$GPGGA,072459.739,,,,,0,00,,,M,0.0,M,,0000*56"
+    NMEA.scan(empty_gga, self)
+    assert_equal 1, @gga_called
+    assert_equal Time.utc(1970, 1, 1, 07, 24, 59, 739), @time
+    assert_equal nil, @latitude
+    assert_equal nil, @longitude
+    assert_equal 0, @gps_quality
+    assert_equal 0, @active_satellite_count
+    assert_equal nil, @hdop
+    assert_equal nil, @altitude
+    assert_equal 0, @geoidal_height
+    assert_equal nil, @dgps_data_age
+    assert_equal 0, @dgps_station_id
+    
+    good_gga = "$GPGGA,072642.711,5546.5395,N,03741.2180,E,1,03,10.6,174.3,M,14.4,M,,0000*68"
+    NMEA.scan(good_gga, self)
+    assert_equal 2, @gga_called
+    assert_equal Time.utc(1970, 1, 1, 07, 26, 42, 711), @time
+    assert_equal GPS::Latitude.new(55, 46.5395), @latitude
+    assert_equal GPS::Longitude.new(37, 41.2180), @longitude
+    assert_equal 1, @gps_quality
+    assert_equal 3, @active_satellite_count
+    assert_equal 10.6, @hdop
+    assert_equal 174.3, @altitude
+    assert_equal 14.4, @geoidal_height
+    assert_equal nil, @dgps_data_age
+    assert_equal 0, @dgps_station_id
+  end
 end

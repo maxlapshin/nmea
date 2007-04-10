@@ -1,4 +1,10 @@
 #include "nmea.h"
+#define TIME_NEW create_gmtime(utc_year, utc_month, utc_day, utc_hours, utc_minutes, utc_seconds, utc_useconds)
+
+static VALUE create_gmtime(int year, int day, int month, int hour, int minute, int second, int usec) {
+	return rb_funcall(rb_cTime, rb_intern("utc"), 7, INT2FIX(year ?: 1970), INT2FIX(month ?: 1), INT2FIX(day?:1), INT2FIX(hour), INT2FIX(minute), INT2FIX(second), INT2FIX(usec));
+}
+
 
 %%{
 	machine NMEA;
@@ -38,8 +44,9 @@
 	
 	northing = "N" | "S" @{current_degrees *= -1;};
 	action set_latitude {
-		latitude.degrees = current_degrees;
-		latitude.minutes = current_float;
+		if(load_constants()) {
+			latitude = rb_funcall(cLatitude, id_new, 2, INT2FIX(current_degrees), rb_float_new(current_float));
+		}
 		current_float = 0;
 		current_degrees = 0;
 	}
@@ -47,8 +54,9 @@
 	
 	easting = "E" | "W" @{current_degrees *= -1;};
 	action set_longitude {
-		longitude.degrees = current_degrees;
-		longitude.minutes = current_float;
+		if(load_constants()) {
+			longitude = rb_funcall(cLongitude, id_new, 2, INT2FIX(current_degrees), rb_float_new(current_float));
+		}
 		current_degrees = 0;
 		current_float = 0;
 	}
@@ -79,8 +87,9 @@ void nmea_scanner(char *p, VALUE handler) {
 	int current_degrees = 0;
 	double current_minutes = 0.0;
 	int bcd = 0;
-	int utc_hours, utc_minutes;
-	int utc_day, utc_month, utc_year, utc_seconds, utc_useconds;
+	int utc_hours = 0, utc_minutes = 0;
+	int utc_day = 0, utc_month = 0, utc_year = 0, utc_seconds = 0, utc_useconds = 0;
+	VALUE latitude = Qnil, longitude = Qnil;
 	
 	char checksum[4];
 	checksum[3] = 0;
@@ -95,13 +104,13 @@ void nmea_scanner(char *p, VALUE handler) {
 	VALUE gsa_pdop = Qnil, gsa_hdop = Qnil, gsa_vdop = Qnil;
 	VALUE gsa_prns[12];
 	//GGA
-	int gps_quality, active_satellite_count, dgps_station_id;
-	double altitude, geoidal_height, dgps_data_age;
+	int gps_quality, dgps_station_id;
+	VALUE active_satellite_count = Qnil;
+	VALUE altitude = Qnil, geoidal_height = Qnil, dgps_data_age = Qnil;
 	char altitude_units, geoidal_height_units;
 	
 	
 	%% write init;
-	angle_value latitude, longitude;
 	
 	pe = p + strlen(p);
 	%% write exec;
