@@ -61,7 +61,7 @@
 	include "gsa.rl";
 	include "gga.rl";
 	
-	sentence = rmc @read_rmc | gsv newline @read_gsv | gsa newline @read_gsa | gga newline @read_gga;
+	sentence = rmc @read_rmc | gsv @read_gsv | gsa @read_gsa | gga @read_gga;
 	main := (sentence newline?)+;
 }%%
 
