@@ -54,7 +54,7 @@
 	}
 	longitude = (b3cd @set_degrees number comma easting @set_longitude| comma) comma;
 	
-	checksum = nmea_char @{checksum[0] = fc;} nmea_char @{checksum[1] = fc;} nmea_char @{checksum[2] = fc;};
+	checksum = '*' @{checksum[0] = fc;} alnum @{checksum[1] = fc;} alnum @{checksum[2] = fc;};
 
 	include "rmc.rl";
 	include "gsv.rl";
@@ -88,7 +88,7 @@ void nmea_scanner(char *p, VALUE handler) {
 	int rmc_valid = 0;
 	VALUE knot_speed, course, magnetic_variation;
 	//GSV
-	static VALUE satellites = Qnil;
+	VALUE satellites = Qnil;
 	int total_gsv_number, current_gsv_number, total_satellites, satellite_number, elevation, azimuth, snr_db;
 	//GSA
 	int gsa_manual, gsa_mode, gsa_prn_index;

@@ -24,6 +24,14 @@ class NMEAHandler
   end
 end
 
+
+class Float
+  def precision(x)
+    (self * 10**x).round / (10**x).to_f
+  end
+end
+
+
 module GPS
   AngleValue = Struct.new :degrees, :minutes
   
@@ -34,6 +42,10 @@ module GPS
     
     def to_degrees
       "%.6f" % [degrees + minutes/60]
+    end
+    
+    def ==(value)
+      value.respond_to?(:degrees) && value.respond_to?(:minutes) && degrees == value.degrees && minutes.precision(4) == value.minutes.precision(4)
     end
   end
   

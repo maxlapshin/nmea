@@ -33,7 +33,7 @@ spec = Gem::Specification.new do |s|
     Dir.glob("{test}/**/*") + 
     Dir.glob("ext/**/*.{h,c,cpp,rb,hpp}") +
     Dir.glob("lib/**/*.rb")
-  s.test_files = FileList["{test}/**/*.rb"].to_a
+  s.test_files = FileList["test/test_*.rb"].to_a
   s.has_rdoc = true
   s.extra_rdoc_files = ["README"]
   s.rdoc_options = PKG_RDOC_OPTS
@@ -49,7 +49,7 @@ task :default => [ :test ]
 desc "Run all tests"
 Rake::TestTask.new("test") { |t|
   t.libs << "test"
-  t.pattern = 'test/*.rb'
+  t.pattern = 'test/test_*.rb'
   t.verbose = true
 }
 
