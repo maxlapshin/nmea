@@ -65,9 +65,37 @@ class TestScanLines < Test::Unit::TestCase
     assert_equal 300, @satellites.first.azimuth
     assert_equal 33, @satellites.first.signal_level
   end
+
+
+  def gsa(mode_state, mode, satellites, pdop, hdop, vdop)
+    @gsa_called = (@gsa_called || 0) + 1
+    @mode_state = mode_state
+    @mode = mode
+    @satellites = satellites
+    @pdop = pdop
+    @hdop = hdop
+    @vdop = vdop
+  end
   
   def test_gsa
     empty_gsa = "$GPGSA,A,1,,,,,,,,,,,,,,,*1E"
+    NMEA.scan(empty_gsa, self)
+    assert_equal 1, @gsa_called
+    assert_equal :automatic, @mode_state
+    assert_equal :no_fix, @mode
+    assert_equal [nil, nil, nil,nil,nil,nil,nil,nil,nil,nil,nil,nil], @satellites
+    assert_equal nil, @pdop
+    assert_equal nil, @hdop
+    assert_equal nil, @vdop
+    
     good_gsa = "$GPGSA,A,2,26,29,19,,,,,,,,,,10.6,10.6,1.0*35"
+    NMEA.scan(good_gsa, self)
+    assert_equal 2, @gsa_called
+    assert_equal :automatic, @mode_state
+    assert_equal :gps_2d, @mode
+    assert_equal [26, 29, 19,nil,nil,nil,nil,nil,nil,nil,nil,nil], @satellites
+    assert_equal 10.6, @pdop
+    assert_equal 10.6, @hdop
+    assert_equal 1.0, @vdop
   end
 end

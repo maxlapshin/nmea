@@ -1,7 +1,10 @@
 #include "nmea.h"
 
 VALUE mGPS, mNMEA, cLatitude, cLongitude, cTime, eNMEAError, cSatelliteInfo;
-ID id_GPS, id_Latitude, id_Longitude, id_new, id_rmc, id_gsv, id_start, id_continue, id_finish, id_gsa, id_gga;
+ID id_GPS, id_Latitude, id_Longitude, id_new, id_rmc;
+ID id_gsv, id_gsa, id_gga;
+VALUE id_start, id_continue, id_finish;
+VALUE id_manual, id_automatic, id_no_fix, id_2d, id_3d;
 
 int load_constants() {
 	if(!rb_const_defined(rb_cObject, id_GPS)) return 0;
@@ -26,10 +29,15 @@ void Init_nmea() {
 	id_new = rb_intern("new");
 	id_rmc = rb_intern("rmc");
 	id_gsv = rb_intern("gsv");
-	id_start = rb_intern("start");
-	id_continue = rb_intern("continue");
-	id_finish = rb_intern("finish");
+	id_start = ID2SYM(rb_intern("start"));
+	id_continue = ID2SYM(rb_intern("continue"));
+	id_finish = ID2SYM(rb_intern("finish"));
 	id_gsa = rb_intern("gsa");
+	id_manual = ID2SYM(rb_intern("manual"));
+	id_automatic = ID2SYM(rb_intern("automatic"));
+	id_no_fix = ID2SYM(rb_intern("no_fix"));
+	id_2d = ID2SYM(rb_intern("gps_2d"));
+	id_3d = ID2SYM(rb_intern("gps_3d"));
 	id_gga = rb_intern("gga");
 	cLatitude = Qnil;
 	cLongitude = Qnil;

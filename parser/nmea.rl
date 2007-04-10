@@ -92,7 +92,7 @@ void nmea_scanner(char *p, VALUE handler) {
 	int total_gsv_number, current_gsv_number, total_satellites, satellite_number, elevation, azimuth, snr_db;
 	//GSA
 	int gsa_manual, gsa_mode, gsa_prn_index;
-	double gsa_pdop, gsa_hdop, gsa_vdop;
+	VALUE gsa_pdop = Qnil, gsa_hdop = Qnil, gsa_vdop = Qnil;
 	VALUE gsa_prns[12];
 	//GGA
 	int gps_quality, active_satellite_count, dgps_station_id;

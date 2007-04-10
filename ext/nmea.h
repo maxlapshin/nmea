@@ -14,7 +14,8 @@ typedef struct {
 } angle_value;
 
 extern VALUE mGPS, mNMEA, cLatitude, cLongitude, cTime, eNMEAError, cSatelliteInfo;
-extern ID id_GPS, id_Latitude, id_Longitude, id_new, id_rmc, id_gsv, id_start, id_continue, id_finish, id_gsa, id_gga;
+extern ID id_GPS, id_Latitude, id_Longitude, id_new, id_rmc, id_gsv, id_gsa, id_gga;
+extern VALUE id_start, id_continue, id_finish, id_manual, id_automatic, id_no_fix, id_2d, id_3d;
 
 
 int load_constants();

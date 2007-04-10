@@ -23,14 +23,14 @@
 	sv_info = sv_prn_number elevation azimuth snr_db;
 	
 	action read_gsv {
-		ID flag = id_continue;
+		VALUE flag = id_continue;
 		if(current_gsv_number == 1) {
 			flag = id_start;
 		} else if(current_gsv_number == total_gsv_number) {
 			flag = id_finish;
 		}
 		if(rb_respond_to(handler, id_gsv)) {
-			rb_funcall(handler, id_gsv, 2, ID2SYM(flag), satellites);
+			rb_funcall(handler, id_gsv, 2, flag, satellites);
 		}
 		satellites = Qnil;
 	}
