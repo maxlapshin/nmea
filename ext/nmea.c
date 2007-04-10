@@ -2,7 +2,7 @@
 #include "nmea.h"
 #define TIME_NEW create_gmtime(utc_year, utc_month, utc_day, utc_hours, utc_minutes, utc_seconds, utc_useconds)
 
-static VALUE create_gmtime(int year, int day, int month, int hour, int minute, int second, int usec) {
+static VALUE create_gmtime(int year, int month, int day, int hour, int minute, int second, int usec) {
 	return rb_funcall(rb_cTime, rb_intern("utc"), 7, INT2FIX(year ?: 1970), INT2FIX(month ?: 1), INT2FIX(day?:1), INT2FIX(hour), INT2FIX(minute), INT2FIX(second), INT2FIX(usec));
 }
 
@@ -517,11 +517,11 @@ _match:
 	break;
 	case 13:
 #line 38 "nmea.rl"
-	{ utc_month = bcd-1;}
+	{ utc_month = bcd;}
 	break;
 	case 14:
 #line 38 "nmea.rl"
-	{ utc_year = 100+bcd;}
+	{ utc_year = bcd > 70 ? 1900+bcd : 2000+bcd;}
 	break;
 	case 15:
 #line 40 "nmea.rl"
@@ -609,13 +609,9 @@ _match:
 	case 32:
 #line 10 "nmea.rl"
 	{
-		struct tm t = {tm_sec : utc_seconds, tm_min : utc_minutes, tm_hour:utc_hours,
-			 tm_mday:utc_day, tm_mon:utc_month, tm_year:utc_year, tm_gmtoff:0};
 		VALUE _lat = Qnil, _long = Qnil, _utc = Qnil;
-		time_t _t = timegm(&t);
-		_utc = rb_time_new(_t, utc_useconds);
 		if(rb_respond_to(handler, id_rmc)) {
-			rb_funcall(handler, id_rmc, 6, _utc, latitude, longitude, knot_speed, course, magnetic_variation);
+			rb_funcall(handler, id_rmc, 6, TIME_NEW, latitude, longitude, knot_speed, course, magnetic_variation);
 		}
 	}
 	break;
@@ -782,7 +778,7 @@ _match:
 		}
 	}
 	break;
-#line 786 "../ext/nmea.c"
+#line 782 "../ext/nmea.c"
 		}
 	}
 

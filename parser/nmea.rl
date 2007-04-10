@@ -1,7 +1,7 @@
 #include "nmea.h"
 #define TIME_NEW create_gmtime(utc_year, utc_month, utc_day, utc_hours, utc_minutes, utc_seconds, utc_useconds)
 
-static VALUE create_gmtime(int year, int day, int month, int hour, int minute, int second, int usec) {
+static VALUE create_gmtime(int year, int month, int day, int hour, int minute, int second, int usec) {
 	return rb_funcall(rb_cTime, rb_intern("utc"), 7, INT2FIX(year ?: 1970), INT2FIX(month ?: 1), INT2FIX(day?:1), INT2FIX(hour), INT2FIX(minute), INT2FIX(second), INT2FIX(usec));
 }
 
@@ -35,7 +35,7 @@ static VALUE create_gmtime(int year, int day, int month, int hour, int minute, i
 # $GPRMC,072458.748,V,,,,,,,080407,,*23
 # $GPRMC,072644.711,A,5546.5275,N,03741.2278,E,0.00,,080407,,*1B
 	utc_time = bcd @{ utc_hours = bcd; } bcd @{ utc_minutes = bcd;} bcd @{ utc_seconds = bcd; } "." b3cd @{ utc_useconds = bcd;} comma;
-	utc_date = bcd @{ utc_day = bcd; } bcd @{ utc_month = bcd-1;} bcd @{ utc_year = 100+bcd;};
+	utc_date = bcd @{ utc_day = bcd; } bcd @{ utc_month = bcd;} bcd @{ utc_year = bcd > 70 ? 1900+bcd : 2000+bcd;};
 	
 	action set_degrees {
 		current_degrees = bcd;

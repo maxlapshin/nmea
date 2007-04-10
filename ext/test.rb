@@ -32,7 +32,7 @@ class SerialPort
 end
 
 @handler = NMEAHandler.new
-@f = File.open("log.txt")
+@f = File.open(File.dirname(__FILE__)+"/../parser/log.txt")
 loop do
   #sentence = SerialPort.try_gets("/dev/tty.usbserial", 4800, 8, 1, SerialPort::NONE)
   sentence = @f.gets

@@ -4,10 +4,10 @@ class NMEAHandler
   end
   def rmc(time, latitude, longitude, speed, course, magnetic_variation)
     line = "#{latitude.to_degrees rescue "nil"}, #{longitude.to_degrees rescue "nil"}, #{@rmc.empty? ? "1" : "0"}, -777.0, 39181.2648590, #{time.strftime("%d-%b-%y, %H:%M:%S")}"
-    File.open("t.plt", "a+") do |f|
-      @rmc << line
-      f << line + "\n"
-    end
+    #File.open("t.plt", "a+") do |f|
+    #  @rmc << line
+    #  f << line + "\n"
+    #end
     puts line
   end
   
