@@ -54,18 +54,15 @@
 	}
 	longitude = (b3cd @set_degrees number comma easting @set_longitude| comma) comma;
 	
-	knot_speed = (number @{current_float = 0;} | zlen) comma;
-	course = (number @{current_float = 0;} | zlen) comma;
-	magnetic_variation = number @{current_float = 0;} comma easting | comma;
-	checksum = nmea_char+;
+	checksum = nmea_char @{checksum[0] = fc;} nmea_char @{checksum[1] = fc;} nmea_char @{checksum[2] = fc;};
 
 	include "rmc.rl";
 	include "gsv.rl";
 	include "gsa.rl";
 	include "gga.rl";
 	
-	sentence = rmc newline @read_rmc | gsv newline @read_gsv | gsa newline @read_gsa | gga newline @read_gga;
-	main := sentence+;
+	sentence = rmc @read_rmc | gsv newline @read_gsv | gsa newline @read_gsa | gga newline @read_gga;
+	main := (sentence newline?)+;
 }%%
 
 
@@ -84,8 +81,12 @@ void nmea_scanner(char *p, VALUE handler) {
 	int bcd = 0;
 	int utc_hours, utc_minutes;
 	int utc_day, utc_month, utc_year, utc_seconds, utc_useconds;
+	
+	char checksum[4];
+	checksum[3] = 0;
 	//RMC
 	int rmc_valid = 0;
+	VALUE knot_speed, course, magnetic_variation;
 	//GSV
 	static VALUE satellites = Qnil;
 	int total_gsv_number, current_gsv_number, total_satellites, satellite_number, elevation, azimuth, snr_db;

@@ -3,58 +3,9 @@ require 'rubygems'
 require 'rutils'
 require 'serialport'
 require 'nmea'
+require File.dirname(__FILE__)+"/../test/mocks"
 
 
-class NMEAHandler
-  def initialize
-    @rmc = []
-  end
-  def rmc(latitude, longitude, time)
-    line = "#{latitude.to_degrees rescue "nil"}, #{longitude.to_degrees rescue "nil"}, #{@rmc.empty? ? "1" : "0"}, -777.0, 39181.2648590, #{time.strftime("%d-%b-%y, %H:%M:%S")}"
-    File.open("t.plt", "a+") do |f|
-      @rmc << line
-      f << line + "\n"
-    end
-    puts line
-  end
-  
-  def gsv(satellites)
-    puts "Satellites"
-  end
-  
-  def gsa(mode_state, mode, satellites, pdop, hdop, vdop)
-#    puts "GSA: #{mode_state},#{mode},#{satellites.inspect},#{pdop},#{hdop},#{vdop}"
-  end
-  
-  def gga(time, latitude, longitude, gps_quality, active_satellite_count, gsa_hdop, altitude, geoidal_height, dgps_data_age, dgps_station_id)
-    puts "GGA: #{time}, #{latitude}, #{longitude}, #{gps_quality}, #{active_satellite_count}, #{gsa_hdop}, #{altitude}, #{geoidal_height}, #{dgps_data_age}, #{dgps_station_id}"
-  end
-end
-
-module GPS
-  AngleValue = Struct.new :degrees, :minutes
-  
-  class AngleValue
-    def to_s
-      "%d %.4f%s" % [degrees.abs, minutes, symbol]
-    end
-    
-    def to_degrees
-      "%.6f" % [degrees + minutes/60]
-    end
-  end
-  
-  class Latitude < AngleValue
-    def symbol
-      degrees >= 0 ? "N" : "S"
-    end
-  end
-  class Longitude < AngleValue
-    def symbol
-      degrees >= 0 ? "E" : "W"
-    end
-  end
-end
 
 class SerialPort
   def self.try_open(port, *params)
