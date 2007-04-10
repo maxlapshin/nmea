@@ -10,8 +10,8 @@ PKG_VERSION = "0.1"
 PKG_AUTHOR = "Max Lapshin"
 PKG_EMAIL = "max@maxidoors.ru"
 PKG_HOMEPAGE = "http://maxidoors.ru/"
-PKG_SUMMARY = "Exiv2 (exif image tags handling) library driver"
-PKG_SVN = "http://svn.maxidoors.ru/nmea"
+PKG_SUMMARY = "NMEA (GPS protocol) parser"
+PKG_SVN = "http://svn.maxidoors.ru/ruby-nmea/"
 PKG_RDOC_OPTS = ['--main=README',
                  '--line-numbers',
                  '--webcvs='+PKG_SVN,
@@ -35,7 +35,6 @@ spec = Gem::Specification.new do |s|
     Dir.glob("lib/**/*.rb")
   s.test_files = FileList["test/test_*.rb"].to_a
   s.has_rdoc = true
-  s.extra_rdoc_files = ["README"]
   s.rdoc_options = PKG_RDOC_OPTS
   s.extensions << 'ext/extconf.rb'
 end
@@ -63,10 +62,6 @@ task :stats  do
   ).to_s
 end
 
-desc "Generate file with C with all methods for proper rdoc"
-file "nmea.c" do
-  `cat lib/*.c > nmea.c`
-end
 
 
 desc "Generate RDoc documentation"
@@ -77,7 +72,7 @@ Rake::RDocTask.new("doc") do |rdoc|
 #  rdoc.rdoc_files.include('CHANGELOG')
 #  rdoc.rdoc_files.include('TODO')
   rdoc.options = PKG_RDOC_OPTS
-#  rdoc.rdoc_files.include "nmea.cpp"
+  rdoc.rdoc_files.include "ext/ruby_nmea.c"
 end
 
 #Rake::GemPackageTask.new(spec) do |p|

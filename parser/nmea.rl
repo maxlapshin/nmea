@@ -32,8 +32,6 @@ static VALUE create_gmtime(int year, int month, int day, int hour, int minute, i
 	integer = (digit @add_digit)+ ;
 	number = integer ("." @switch_to_float) (digit @add_digit_after_comma)+;
 	
-# $GPRMC,072458.748,V,,,,,,,080407,,*23
-# $GPRMC,072644.711,A,5546.5275,N,03741.2278,E,0.00,,080407,,*1B
 	utc_time = bcd @{ utc_hours = bcd; } bcd @{ utc_minutes = bcd;} bcd @{ utc_seconds = bcd; } "." b3cd @{ utc_useconds = bcd;} comma;
 	utc_date = bcd @{ utc_day = bcd; } bcd @{ utc_month = bcd;} bcd @{ utc_year = bcd > 70 ? 1900+bcd : 2000+bcd;};
 	
@@ -115,7 +113,7 @@ void nmea_scanner(char *p, VALUE handler) {
 	pe = p + strlen(p);
 	%% write exec;
 	if(cs == NMEA_error) {
-		rb_raise(eNMEAError, "PARSE ERROR on line %d: '%s'\n", line_counter, p);
+		rb_raise(eParseError, "PARSE ERROR on line %d: '%s'\n", line_counter, p);
 	}
 }
 

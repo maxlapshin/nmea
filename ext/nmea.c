@@ -7,7 +7,7 @@ static VALUE create_gmtime(int year, int month, int day, int hour, int minute, i
 }
 
 
-#line 74 "nmea.rl"
+#line 72 "nmea.rl"
 
 
 
@@ -334,7 +334,7 @@ static const int NMEA_start = 1;
 
 static const int NMEA_error = 0;
 
-#line 78 "nmea.rl"
+#line 76 "nmea.rl"
 
 
 void nmea_scanner(char *p, VALUE handler) {
@@ -375,7 +375,7 @@ void nmea_scanner(char *p, VALUE handler) {
 	{
 	cs = NMEA_start;
 	}
-#line 114 "nmea.rl"
+#line 112 "nmea.rl"
 	
 	pe = p + strlen(p);
 	
@@ -496,46 +496,46 @@ _match:
 	{bcd = bcd*10 + ((*p) - '0');}
 	break;
 	case 8:
-#line 37 "nmea.rl"
+#line 35 "nmea.rl"
 	{ utc_hours = bcd; }
 	break;
 	case 9:
-#line 37 "nmea.rl"
+#line 35 "nmea.rl"
 	{ utc_minutes = bcd;}
 	break;
 	case 10:
-#line 37 "nmea.rl"
+#line 35 "nmea.rl"
 	{ utc_seconds = bcd; }
 	break;
 	case 11:
-#line 37 "nmea.rl"
+#line 35 "nmea.rl"
 	{ utc_useconds = bcd;}
 	break;
 	case 12:
-#line 38 "nmea.rl"
+#line 36 "nmea.rl"
 	{ utc_day = bcd; }
 	break;
 	case 13:
-#line 38 "nmea.rl"
+#line 36 "nmea.rl"
 	{ utc_month = bcd;}
 	break;
 	case 14:
-#line 38 "nmea.rl"
+#line 36 "nmea.rl"
 	{ utc_year = bcd > 70 ? 1900+bcd : 2000+bcd;}
 	break;
 	case 15:
-#line 40 "nmea.rl"
+#line 38 "nmea.rl"
 	{
 		current_degrees = bcd;
 		bcd = 0;
 	}
 	break;
 	case 16:
-#line 45 "nmea.rl"
+#line 43 "nmea.rl"
 	{current_degrees *= -1;}
 	break;
 	case 17:
-#line 46 "nmea.rl"
+#line 44 "nmea.rl"
 	{
 		if(load_constants()) {
 			latitude = rb_funcall(cLatitude, id_new, 2, INT2FIX(current_degrees), rb_float_new(current_float));
@@ -545,11 +545,11 @@ _match:
 	}
 	break;
 	case 18:
-#line 55 "nmea.rl"
+#line 53 "nmea.rl"
 	{current_degrees *= -1;}
 	break;
 	case 19:
-#line 56 "nmea.rl"
+#line 54 "nmea.rl"
 	{
 		if(load_constants()) {
 			longitude = rb_funcall(cLongitude, id_new, 2, INT2FIX(current_degrees), rb_float_new(current_float));
@@ -559,15 +559,15 @@ _match:
 	}
 	break;
 	case 20:
-#line 65 "nmea.rl"
+#line 63 "nmea.rl"
 	{checksum[0] = (*p);}
 	break;
 	case 21:
-#line 65 "nmea.rl"
+#line 63 "nmea.rl"
 	{checksum[1] = (*p);}
 	break;
 	case 22:
-#line 65 "nmea.rl"
+#line 63 "nmea.rl"
 	{checksum[2] = (*p);}
 	break;
 	case 23:
@@ -609,7 +609,6 @@ _match:
 	case 32:
 #line 10 "nmea.rl"
 	{
-		VALUE _lat = Qnil, _long = Qnil, _utc = Qnil;
 		if(rb_respond_to(handler, id_rmc)) {
 			rb_funcall(handler, id_rmc, 6, TIME_NEW, latitude, longitude, knot_speed, course, magnetic_variation);
 		}
@@ -765,11 +764,6 @@ _match:
 	case 62:
 #line 8 "nmea.rl"
 	{
-		VALUE _lat = Qnil, _long = Qnil;
-
-	//	struct tm t = {tm_sec : utc_seconds, tm_min : utc_minutes, tm_hour:utc_hours, tm_mday:0, tm_mon:0, tm_year:0, tm_gmtoff:0};
-	//	time_t _t = timegm(&t);
-	// rb_time_new(_t, utc_useconds)
 		if(rb_respond_to(handler, id_gga)) {
 			rb_funcall(handler, id_gga, 10, TIME_NEW, latitude, longitude,
 				INT2FIX(gps_quality), active_satellite_count,
@@ -778,7 +772,7 @@ _match:
 		}
 	}
 	break;
-#line 782 "../ext/nmea.c"
+#line 776 "../ext/nmea.c"
 		}
 	}
 
@@ -787,9 +781,9 @@ _again:
 		goto _resume;
 	_out: {}
 	}
-#line 117 "nmea.rl"
+#line 115 "nmea.rl"
 	if(cs == NMEA_error) {
-		rb_raise(eNMEAError, "PARSE ERROR on line %d: '%s'\n", line_counter, p);
+		rb_raise(eParseError, "PARSE ERROR on line %d: '%s'\n", line_counter, p);
 	}
 }
 

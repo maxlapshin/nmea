@@ -1,6 +1,6 @@
 #include "nmea.h"
 
-VALUE mGPS, mNMEA, cLatitude, cLongitude, cTime, eNMEAError, cSatelliteInfo;
+VALUE mGPS, mNMEA, cLatitude, cLongitude, cTime, eParseError, cSatelliteInfo;
 ID id_GPS, id_Latitude, id_Longitude, id_new, id_rmc;
 ID id_gsv, id_gsa, id_gga;
 VALUE id_start, id_continue, id_finish;
@@ -16,11 +16,16 @@ int load_constants() {
 	return 1;
 }
 
+/*
+ * Usage: NMEA::scan(nmea_sentence, handler)
+ */
 static VALUE scan(VALUE self, VALUE sentence, VALUE handler) {
 	Check_Type(sentence, T_STRING);
 	nmea_scanner(RSTRING(sentence)->ptr, handler);
 	return Qnil;
 }
+
+
 
 void Init_nmea() {
 	id_GPS = rb_intern("GPS");
@@ -42,9 +47,19 @@ void Init_nmea() {
 	cLatitude = Qnil;
 	cLongitude = Qnil;
 	cTime = rb_const_get(rb_cObject, rb_intern("Time"));
+/*
+ * Document-module: NMEA
+ * NMEA module has the only method: scan. Better read about it.
+ */
 	mNMEA = rb_define_module("NMEA");
 	rb_define_singleton_method(mNMEA, "scan", scan, 2);
-	eNMEAError = rb_define_class_under(mNMEA, "NMEAError", rb_eStandardError);
+/*
+ * Document-class: NMEA::ParseError
+ * You will receive ParseError if NMEA::scan cannot parse sentence. Usually it happens, when
+ * you try to parse broken sentence. Perhaps, through it away.
+ */
+	eParseError = rb_define_class_under(mNMEA, "ParseError", rb_eStandardError);
 	cSatelliteInfo = rb_struct_define(NULL, "number", "elevation", "azimuth", "signal_level", NULL);
+	/* Struct.new(:number, :elevation, :azimuth, :signal_level): assigned to SatelliteInfo */
 	rb_define_const(mNMEA, "SatelliteInfo", cSatelliteInfo);
 }
