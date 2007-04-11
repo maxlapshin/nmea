@@ -2,7 +2,7 @@
 require 'rubygems'
 require 'rutils'
 require 'serialport'
-require 'nmea'
+require File.dirname(__FILE__)+"/../lib/nmea"
 require File.dirname(__FILE__)+"/../test/mocks"
 
 
@@ -37,7 +37,6 @@ loop do
   sentence = SerialPort.try_gets("/dev/tty.usbserial", 4800, 8, 1, SerialPort::NONE)
   #sentence = @f.gets
   break unless sentence
-  #puts sentence if sentence =~ /\$GPGGA/
   begin
     NMEA.scan(sentence, NMEAHandler.new)
   rescue NMEA::ParseError => e

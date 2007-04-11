@@ -179,14 +179,14 @@ class TestScanLines < Test::Unit::TestCase
   
   handler :gll, :latitude, :longitude, :time
   def test_gll
-    empty_gll = "$GPGLL,,,,,192642.609,V*65"
+    empty_gll = "$GPGLL,,,,,192642.609,V*1D"
     NMEA.scan(empty_gll, self)
     assert_equal 1, @gll_called
     assert_equal nil, @latitude
     assert_equal nil, @longitude
     assert_equal Time.utc(1970, 1, 1, 19, 26, 42, 609), @time
     
-    good_gll = "$GPGLL,5546.5059,N,03741.1635,E,193703.532,A*64"
+    good_gll = "$GPGLL,5546.5059,N,03741.1635,E,193703.532,A*34"
     NMEA.scan(good_gll, self)
     assert_equal 2, @gll_called
     assert_equal GPS::Latitude.new(55, 46.5059), @latitude

@@ -8,7 +8,7 @@
 #include <time.h>
 #include <math.h>
 
-extern VALUE mGPS, mNMEA, cLatitude, cLongitude, cTime, eParseError, cSatelliteInfo;
+extern VALUE mGPS, mNMEA, cLatitude, cLongitude, cTime, eParseError, eDataError, cSatelliteInfo;
 extern ID id_GPS, id_Latitude, id_Longitude, id_new, id_rmc, id_gsv, id_gsa, id_gga, id_psrftxt, id_vtg, id_gll;
 extern VALUE id_start, id_continue, id_finish, id_manual, id_automatic, id_no_fix, id_2d, id_3d;
 extern VALUE id_autonomus, id_differential, id_estimated, id_invalid; 

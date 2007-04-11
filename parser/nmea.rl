@@ -67,7 +67,22 @@ static VALUE create_gmtime(int year, int month, int day, int hour, int minute, i
 	}
 	longitude = (b3cd @set_degrees number comma easting @set_longitude| comma) comma;
 	
-	checksum = '*' @{checksum[0] = fc;} alnum @{checksum[1] = fc;} alnum @{checksum[2] = fc;};
+	action sentence_begin {
+		sentence_begin = p+1;
+	}
+	action check_sum {
+		checksum[1] = fc;
+		unsigned char sum = 0, *ptr;
+		for(ptr = sentence_begin; ptr != sentence_end; ptr++) {
+			sum ^= *ptr;
+		}
+		unsigned int sum_provided;
+		sscanf(checksum, "%x", &sum_provided);
+		if(sum_provided != sum) {
+			rb_raise(eDataError, "Checksum didn't match: provided is %d, calculated is %d", sum_provided, sum);
+		}
+	}
+	checksum = '*' @{sentence_end = p; } alnum @{checksum[0] = fc;} alnum @check_sum;
 
 	include "rmc.rl";
 	include "gsv.rl";
@@ -77,7 +92,7 @@ static VALUE create_gmtime(int year, int month, int day, int hour, int minute, i
 	include "vtg.rl";
 	include "gll.rl";
 	
-	sentence = rmc %read_rmc | gsv %read_gsv | gsa %read_gsa | gga %read_gga | psrftxt %read_psrftxt | vtg %read_vtg | gll %read_gll;
+	sentence = zlen %sentence_begin rmc %read_rmc | gsv %read_gsv | gsa %read_gsa | gga %read_gga | psrftxt %read_psrftxt | vtg %read_vtg | gll %read_gll;
 	main := (sentence newline)+;
 }%%
 
@@ -99,11 +114,12 @@ void nmea_scanner(char *p, VALUE handler) {
 	int utc_day = 0, utc_month = 0, utc_year = 0, utc_seconds = 0, utc_useconds = 0;
 	VALUE latitude = Qnil, longitude = Qnil;
 	
-	char checksum[4];
-	checksum[3] = 0;
+	char checksum[3];
+	checksum[2] = 0;
 	int sentence_len = strlen(p);
 	char current_string[sentence_len+1];
 	char *current_s = current_string;
+	char *sentence_begin = NULL, *sentence_end = NULL;
 	
 	//RMC
 	int rmc_valid = 0;

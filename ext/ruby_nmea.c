@@ -1,6 +1,6 @@
 #include "nmea.h"
 
-VALUE mGPS, mNMEA, cLatitude, cLongitude, cTime, eParseError, cSatelliteInfo;
+VALUE mGPS, mNMEA, cLatitude, cLongitude, cTime, eParseError, eDataError, cSatelliteInfo;
 ID id_GPS, id_Latitude, id_Longitude, id_new, id_rmc;
 ID id_gsv, id_gsa, id_gga, id_psrftxt, id_vtg, id_gll;
 VALUE id_start, id_continue, id_finish;
@@ -76,6 +76,11 @@ void Init_nmea_bin() {
  * you try to parse broken sentence. Perhaps, through it away.
  */
 	eParseError = rb_define_class_under(mNMEA, "ParseError", rb_eStandardError);
+/*
+ * Document-class: NMEA::DataError
+ * You will receive DataError if checksum, provided in NMEA sentence doesn't match the sentence
+ */
+	eDataError = rb_define_class_under(mNMEA, "DataError", rb_eStandardError);
 	cSatelliteInfo = rb_struct_define(NULL, "number", "elevation", "azimuth", "signal_level", NULL);
 	/* Struct.new(:number, :elevation, :azimuth, :signal_level): assigned to SatelliteInfo */
 	rb_define_const(mNMEA, "SatelliteInfo", cSatelliteInfo);
