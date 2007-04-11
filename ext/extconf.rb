@@ -1,3 +1,3 @@
 #!/usr/bin/env ruby
 require 'mkmf'
-create_makefile 'nmea'
+create_makefile 'nmea_bin'

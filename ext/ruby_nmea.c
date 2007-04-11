@@ -27,7 +27,7 @@ static VALUE scan(VALUE self, VALUE sentence, VALUE handler) {
 
 
 
-void Init_nmea() {
+void Init_nmea_bin() {
 	id_GPS = rb_intern("GPS");
 	id_Latitude = rb_intern("Latitude");
 	id_Longitude = rb_intern("Longitude");
