@@ -34,13 +34,16 @@ end
 @handler = NMEAHandler.new
 @f = File.open(File.dirname(__FILE__)+"/../parser/log.txt")
 loop do
-  #sentence = SerialPort.try_gets("/dev/tty.usbserial", 4800, 8, 1, SerialPort::NONE)
-  sentence = @f.gets
+  sentence = SerialPort.try_gets("/dev/tty.usbserial", 4800, 8, 1, SerialPort::NONE)
+  #sentence = @f.gets
   break unless sentence
   #puts sentence if sentence =~ /\$GPGGA/
   begin
     NMEA.scan(sentence, NMEAHandler.new)
-  rescue NMEA::NMEAError => e
+  rescue NMEA::ParseError => e
+    File.open("parse.log", "a") do |f|
+      f << "'#{sentence}'\n"
+    end
     puts "Parse error: '#{sentence}'"
   end
 end

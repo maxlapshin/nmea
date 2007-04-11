@@ -13,6 +13,6 @@
 		}
 	}
 
-	rmc = "$GPRMC" comma utc_time rmc_state latitude longitude knot_speed course utc_date comma magnetic_variation checksum;
+	rmc = "$GPRMC," utc_time rmc_state latitude longitude knot_speed course utc_date comma magnetic_variation checksum;
 	
 }%%

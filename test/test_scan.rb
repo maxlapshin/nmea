@@ -1,15 +1,15 @@
 require File.dirname(__FILE__)+"/helper"
 
 class TestScanLines < Test::Unit::TestCase
-  def rmc(utc, latitude, longitude, speed, course, magnetic_variation)
-    @utc = utc
-    @latitude = latitude
-    @longitude = longitude
-    @speed = speed
-    @course = course
-    @magnetic_variation = magnetic_variation
-    @rmc_called = (@rmc_called || 0) + 1
+  def self.handler(name, *params)
+    class_eval <<-EOF
+    def #{name}(#{params.join(", ")})
+      @#{name}_called = (@#{name}_called || 0) + 1
+      #{params.map{|param| "@"+param.to_s+" = "+param.to_s}.join("\n")}
+    end
+    EOF
   end
+  handler :rmc, :utc, :latitude, :longitude, :speed, :course, :magnetic_variation
   
   def test_rmc
     invalid_rmc = "$GPRMC,072458.748,V,,,,,,,080407,,*23"
@@ -64,18 +64,20 @@ class TestScanLines < Test::Unit::TestCase
     assert_equal 38, @satellites.first.elevation
     assert_equal 300, @satellites.first.azimuth
     assert_equal 33, @satellites.first.signal_level
+    
+    @satellites = []
+    strange_gsv = "$GPGSV,3,3,09,20,04,037,*42"
+    NMEA.scan(strange_gsv, self)
+    assert_equal 7, @gsv_called
+    assert_equal 1, @satellites.size
+    assert_equal 20, @satellites.first.number
+    assert_equal 4, @satellites.first.elevation
+    assert_equal 37, @satellites.first.azimuth
+    assert_equal nil, @satellites.first.signal_level
   end
 
 
-  def gsa(mode_state, mode, satellites, pdop, hdop, vdop)
-    @gsa_called = (@gsa_called || 0) + 1
-    @mode_state = mode_state
-    @mode = mode
-    @satellites = satellites
-    @pdop = pdop
-    @hdop = hdop
-    @vdop = vdop
-  end
+  handler :gsa, :mode_state, :mode, :satellites, :pdop, :hdop, :vdop
   
   def test_gsa
     empty_gsa = "$GPGSA,A,1,,,,,,,,,,,,,,,*1E"
@@ -99,19 +101,7 @@ class TestScanLines < Test::Unit::TestCase
     assert_equal 1.0, @vdop
   end
   
-  def gga(time, latitude, longitude, gps_quality, active_satellite_count, hdop, altitude, geoidal_height, dgps_data_age, dgps_station_id)
-    @gga_called = (@gga_called || 0) + 1
-    @time = time
-    @latitude = latitude
-    @longitude = longitude
-    @gps_quality = gps_quality
-    @active_satellite_count = active_satellite_count
-    @hdop = hdop
-    @altitude = altitude
-    @geoidal_height = geoidal_height
-    @dgps_data_age = dgps_data_age
-    @dgps_station_id = dgps_station_id
-  end
+  handler :gga, :time, :latitude, :longitude, :gps_quality, :active_satellite_count, :hdop, :altitude, :geoidal_height, :dgps_data_age, :dgps_station_id
   
   def test_gga
     empty_gga = "$GPGGA,072459.739,,,,,0,00,,,M,0.0,M,,0000*56"
@@ -141,5 +131,65 @@ class TestScanLines < Test::Unit::TestCase
     assert_equal 14.4, @geoidal_height
     assert_equal nil, @dgps_data_age
     assert_equal 0, @dgps_station_id
+  end
+  
+  def psrftxt(key, value)
+    @psrftxt_called = (@psrftxt_called || 0) + 1
+    @psrf[key] = (value || true)
+  end
+  
+  def test_psrftxt
+    @psrf = {}
+    data = [
+      "$PSRFTXT,Version:GSW3.2.2_3.1.00.12-SDK003P1.01a",
+      "$PSRFTXT,Version2:F-GPS-03-0607211",
+      "$PSRFTXT,WAAS Disable",
+      "$PSRFTXT,TOW:  26833",
+      "$PSRFTXT,WK:   1422",
+      "$PSRFTXT,POS:  2845429 2198159 5250582",
+      "$PSRFTXT,CLK:  96413",
+      "$PSRFTXT,CHNL: 12",
+      "$PSRFTXT,Baud rate: 4800"]
+    data.each do |sentence|
+      NMEA.scan(sentence, self)
+    end
+    assert_equal 9, @psrftxt_called
+    assert_equal "GSW3.2.2_3.1.00.12-SDK003P1.01a", @psrf["Version"]
+    assert_equal "F-GPS-03-0607211", @psrf["Version2"]
+    assert_equal true, @psrf["WAAS Disable"]
+    assert_equal "26833", @psrf["TOW"]
+    assert_equal "1422", @psrf["WK"]
+    assert_equal "2845429 2198159 5250582", @psrf["POS"]
+    assert_equal "96413", @psrf["CLK"]
+    assert_equal "12", @psrf["CHNL"]
+    assert_equal "4800", @psrf["Baud rate"]
+  end
+  
+  handler :vtg, :true_course, :magnetic_course, :knot_speed, :kmph_speed, :mode
+  def test_vtg
+    good_vtg = "$GPVTG,225.29,T,,M,2.86,N,5.3,K*64"
+    NMEA.scan(good_vtg, self)
+    assert_equal 1, @vtg_called
+    assert_equal 225.29, @true_course
+    assert_equal nil, @magnetic_course
+    assert_equal 2.86, @knot_speed
+    assert_equal 5.3, @kmph_speed
+    assert_equal nil, @mode
+  end
+  
+  handler :gll, :latitude, :longitude, :time
+  def test_gll
+    empty_gll = "$GPGLL,,,,,192642.609,V*65"
+    NMEA.scan(empty_gll, self)
+    assert_equal 1, @gll_called
+    assert_equal nil, @latitude
+    assert_equal nil, @longitude
+    assert_equal Time.utc(1970, 1, 1, 19, 26, 42, 609), @time
+    
+    good_gll = "$GPGLL,5546.5059,N,03741.1635,E,193703.532,A*64"
+    NMEA.scan(good_gll, self)
+    assert_equal 2, @gll_called
+    assert_equal GPS::Latitude.new(55, 46.5059), @latitude
+    assert_equal GPS::Longitude.new(37, 41.1635), @longitude
   end
 end

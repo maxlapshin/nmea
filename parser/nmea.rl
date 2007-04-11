@@ -9,7 +9,7 @@ static VALUE create_gmtime(int year, int month, int day, int hour, int minute, i
 %%{
 	machine NMEA;
 	
-	newline = ('\r\n' | '\n') @{ curline++; };
+	newline = ('\r\n' | '\n' | '\r');
 	comma = ",";
 	nmea_char = [a-zA-Z0-9,_.*$: \t\-];
 	
@@ -31,6 +31,13 @@ static VALUE create_gmtime(int year, int month, int day, int hour, int minute, i
 	b4cd = b3cd digit @{bcd = bcd*10 + (fc - '0');};
 	integer = (digit @add_digit)+ ;
 	number = integer ("." @switch_to_float) (digit @add_digit_after_comma)+;
+	action add_char {
+		*current_s = fc;
+		current_s++;
+		*current_s = 0;
+	}
+	string = space* <: (nmea_char @add_char)*;
+	key_string = space* <: ((nmea_char - [:]) @add_char)+;
 	
 	utc_time = bcd @{ utc_hours = bcd; } bcd @{ utc_minutes = bcd;} bcd @{ utc_seconds = bcd; } "." b3cd @{ utc_useconds = bcd;} comma;
 	utc_date = bcd @{ utc_day = bcd; } bcd @{ utc_month = bcd;} bcd @{ utc_year = bcd > 70 ? 1900+bcd : 2000+bcd;};
@@ -66,9 +73,12 @@ static VALUE create_gmtime(int year, int month, int day, int hour, int minute, i
 	include "gsv.rl";
 	include "gsa.rl";
 	include "gga.rl";
+	include "psrftxt.rl";
+	include "vtg.rl";
+	include "gll.rl";
 	
-	sentence = rmc @read_rmc | gsv @read_gsv | gsa @read_gsa | gga @read_gga;
-	main := (sentence newline?)+;
+	sentence = rmc %read_rmc | gsv %read_gsv | gsa %read_gsa | gga %read_gga | psrftxt %read_psrftxt | vtg %read_vtg | gll %read_gll;
+	main := (sentence newline)+;
 }%%
 
 
@@ -79,7 +89,7 @@ void nmea_scanner(char *p, VALUE handler) {
 	char *pe;
 	int cs;
 	
-	int line_counter = 0, curline = 0;
+	int line_counter = 0;
 	int current_digit = 0, current_frac = 0;
 	double current_float = 0;
 	int current_degrees = 0;
@@ -91,12 +101,16 @@ void nmea_scanner(char *p, VALUE handler) {
 	
 	char checksum[4];
 	checksum[3] = 0;
+	int sentence_len = strlen(p);
+	char current_string[sentence_len+1];
+	char *current_s = current_string;
+	
 	//RMC
 	int rmc_valid = 0;
 	VALUE knot_speed, course, magnetic_variation;
 	//GSV
-	VALUE satellites = Qnil;
-	int total_gsv_number, current_gsv_number, total_satellites, satellite_number, elevation, azimuth, snr_db;
+	VALUE satellites = Qnil, snr_db = Qnil;
+	int total_gsv_number, current_gsv_number, total_satellites, satellite_number, elevation, azimuth;
 	//GSA
 	int gsa_manual, gsa_mode, gsa_prn_index;
 	VALUE gsa_pdop = Qnil, gsa_hdop = Qnil, gsa_vdop = Qnil;
@@ -106,11 +120,14 @@ void nmea_scanner(char *p, VALUE handler) {
 	VALUE active_satellite_count = Qnil;
 	VALUE altitude = Qnil, geoidal_height = Qnil, dgps_data_age = Qnil;
 	char altitude_units, geoidal_height_units;
-	
+	//PSRFTXT
+	VALUE psrf_key = Qnil, psrf_value = Qnil;
+	//VTG
+	VALUE true_course = Qnil, magnetic_course = Qnil, vtg_knot_speed = Qnil, vtg_kmph_speed = Qnil, vtg_mode = Qnil;
 	
 	%% write init;
 	
-	pe = p + strlen(p);
+	pe = p + sentence_len;
 	%% write exec;
 	if(cs == NMEA_error) {
 		rb_raise(eParseError, "PARSE ERROR on line %d: '%s'\n", line_counter, p);

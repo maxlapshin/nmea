@@ -3,24 +3,31 @@ class NMEAHandler
     @rmc = []
   end
   def rmc(time, latitude, longitude, speed, course, magnetic_variation)
-    line = "#{latitude.to_degrees rescue "nil"}, #{longitude.to_degrees rescue "nil"}, #{@rmc.empty? ? "1" : "0"}, -777.0, 39181.2648590, #{time.strftime("%d-%b-%y, %H:%M:%S")}"
+    #line = "#{latitude.to_degrees rescue "nil"}, #{longitude.to_degrees rescue "nil"}, #{@rmc.empty? ? "1" : "0"}, -777.0, 39181.2648590, #{time.strftime("%d-%b-%y, %H:%M:%S")}"
     #File.open("t.plt", "a+") do |f|
     #  @rmc << line
     #  f << line + "\n"
     #end
-    puts line
+    #puts line
+    puts "RMC: #{latitude.to_degrees rescue "nil"}, #{longitude.to_degrees rescue "nil"}"
   end
   
-  def gsv(satellites)
-    puts "Satellites"
+  def gsv(flag, satellites)
+    puts "GSV" if flag == :start
   end
   
   def gsa(mode_state, mode, satellites, pdop, hdop, vdop)
 #    puts "GSA: #{mode_state},#{mode},#{satellites.inspect},#{pdop},#{hdop},#{vdop}"
+    puts "GSA"
   end
   
   def gga(time, latitude, longitude, gps_quality, active_satellite_count, gsa_hdop, altitude, geoidal_height, dgps_data_age, dgps_station_id)
-    puts "GGA: #{time}, #{latitude}, #{longitude}, #{gps_quality}, #{active_satellite_count}, #{gsa_hdop}, #{altitude}, #{geoidal_height}, #{dgps_data_age}, #{dgps_station_id}"
+    #puts "GGA: #{time}, #{latitude}, #{longitude}, #{gps_quality}, #{active_satellite_count}, #{gsa_hdop}, #{altitude}, #{geoidal_height}, #{dgps_data_age}, #{dgps_station_id}"
+    puts "GGA: #{active_satellite_count}"
+  end
+  
+  def psrftxt(key, value)
+    puts "PSRFTXT"
   end
 end
 

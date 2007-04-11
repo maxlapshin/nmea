@@ -20,5 +20,5 @@
 	gsa_pdop = (number comma @{ gsa_pdop = rb_float_new(current_float); current_float = 0;}) | comma;
 	gsa_hdop = (number comma @{ gsa_hdop = rb_float_new(current_float); current_float = 0;}) | comma;
 	gsa_vdop = (number @{ gsa_vdop = rb_float_new(current_float); current_float = 0;})?;
-	gsa = "$GPGSA" comma gsa_mode gsa_mode_detailed gsa_prn{12} gsa_pdop gsa_hdop gsa_vdop checksum;
+	gsa = "$GPGSA," gsa_mode gsa_mode_detailed gsa_prn{12} gsa_pdop gsa_hdop gsa_vdop checksum;
 }%%

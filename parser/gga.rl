@@ -13,5 +13,5 @@
 				dgps_data_age, INT2FIX(dgps_station_id));
 		}
 	}
-	gga = "$GPGGA" comma utc_time latitude longitude gps_quality active_satellite_count gsa_hdop altitude geoidal_height dgps_data checksum;
+	gga = "$GPGGA," utc_time latitude longitude gps_quality active_satellite_count gsa_hdop altitude geoidal_height dgps_data checksum;
 }%%
