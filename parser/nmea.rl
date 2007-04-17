@@ -1,10 +1,5 @@
-#include "nmea.h"
-#define TIME_NEW create_gmtime(utc_year, utc_month, utc_day, utc_hours, utc_minutes, utc_seconds, utc_useconds)
-
-static VALUE create_gmtime(int year, int month, int day, int hour, int minute, int second, int usec) {
-	return rb_funcall(rb_cTime, rb_intern("utc"), 7, INT2FIX(year ?: 1970), INT2FIX(month ?: 1), INT2FIX(day?:1), INT2FIX(hour), INT2FIX(minute), INT2FIX(second), INT2FIX(usec));
-}
-
+#include "nmea.hpp"
+namespace NMEA {
 
 %%{
 	machine NMEA;
@@ -39,8 +34,8 @@ static VALUE create_gmtime(int year, int month, int day, int hour, int minute, i
 	string = space* <: (nmea_char @add_char)*;
 	key_string = space* <: ((nmea_char - [:]) @add_char)+;
 	
-	utc_time = bcd @{ utc_hours = bcd; } bcd @{ utc_minutes = bcd;} bcd @{ utc_seconds = bcd; } "." b3cd @{ utc_useconds = bcd;} comma;
-	utc_date = bcd @{ utc_day = bcd; } bcd @{ utc_month = bcd;} bcd @{ utc_year = bcd > 70 ? 1900+bcd : 2000+bcd;};
+	utc_time = bcd @{ utc.hour = bcd; } bcd @{ utc.minute = bcd;} bcd @{ utc.second = bcd; } "." b3cd @{ utc.usec = bcd;} comma;
+	utc_date = bcd @{ utc.day = bcd; } bcd @{ utc.month = bcd;} bcd @{ utc.year = bcd > 70 ? 1900+bcd : 2000+bcd;};
 	
 	action set_degrees {
 		current_degrees = bcd;
@@ -49,9 +44,9 @@ static VALUE create_gmtime(int year, int month, int day, int hour, int minute, i
 	
 	northing = "N" | "S" @{current_degrees *= -1;};
 	action set_latitude {
-		if(load_constants()) {
-			latitude = rb_funcall(cLatitude, id_new, 2, INT2FIX(current_degrees), rb_float_new(current_float));
-		}
+		latitude.nil = false;
+		latitude.value.degrees = current_degrees;
+		latitude.value.minutes = current_float;
 		current_float = 0;
 		current_degrees = 0;
 	}
@@ -59,9 +54,9 @@ static VALUE create_gmtime(int year, int month, int day, int hour, int minute, i
 	
 	easting = "E" | "W" @{current_degrees *= -1;};
 	action set_longitude {
-		if(load_constants()) {
-			longitude = rb_funcall(cLongitude, id_new, 2, INT2FIX(current_degrees), rb_float_new(current_float));
-		}
+		longitude.nil = false;
+		longitude.value.degrees = current_degrees;
+		longitude.value.minutes = current_float;
 		current_degrees = 0;
 		current_float = 0;
 	}
@@ -73,34 +68,36 @@ static VALUE create_gmtime(int year, int month, int day, int hour, int minute, i
 	action check_sum {
 		checksum[1] = fc;
 		unsigned char sum = 0, *ptr;
-		for(ptr = sentence_begin; ptr != sentence_end; ptr++) {
+		for(ptr = (unsigned char *)sentence_begin; ptr != (unsigned char*)sentence_end; ptr++) {
 			sum ^= *ptr;
 		}
 		unsigned int sum_provided;
 		sscanf(checksum, "%x", &sum_provided);
 		if(sum_provided != sum) {
-			rb_raise(eDataError, "Checksum didn't match: provided is %d, calculated is %d", sum_provided, sum);
+			//throw(eDataError, "Checksum didn't match: provided is %d, calculated is %d", sum_provided, sum);
+			return false;
 		}
 	}
 	checksum = '*' @{sentence_end = p; } alnum @{checksum[0] = fc;} alnum @check_sum;
 
 	include "rmc.rl";
 	include "gsv.rl";
-	include "gsa.rl";
-	include "gga.rl";
-	include "psrftxt.rl";
-	include "vtg.rl";
-	include "gll.rl";
+#	include "gsa.rl";
+#	include "gga.rl";
+#	include "psrftxt.rl";
+#	include "vtg.rl";
+#	include "gll.rl";
 	
-	sentence = zlen %sentence_begin rmc %read_rmc | gsv %read_gsv | gsa %read_gsa | gga %read_gga | psrftxt %read_psrftxt | vtg %read_vtg | gll %read_gll;
-	main := (sentence newline)+;
+#	sentence = zlen %sentence_begin rmc %read_rmc | gsv %read_gsv | gsa %read_gsa | gga %read_gga | psrftxt %read_psrftxt | vtg %read_vtg | gll %read_gll;
+	sentence = zlen %sentence_begin rmc %read_rmc | gsv %read_gsv;
+	main := sentence newline;
 }%%
 
 
 %% write data nofinal;
 
 
-void nmea_scanner(char *p, VALUE handler) {
+bool nmea_scanner(char *p, Handler& handler) {
 	char *pe;
 	int cs;
 	
@@ -110,9 +107,8 @@ void nmea_scanner(char *p, VALUE handler) {
 	int current_degrees = 0;
 	double current_minutes = 0.0;
 	int bcd = 0;
-	int utc_hours = 0, utc_minutes = 0;
-	int utc_day = 0, utc_month = 0, utc_year = 0, utc_seconds = 0, utc_useconds = 0;
-	VALUE latitude = Qnil, longitude = Qnil;
+	Time utc;
+	Angle latitude, longitude;
 	
 	char checksum[3];
 	checksum[2] = 0;
@@ -122,11 +118,13 @@ void nmea_scanner(char *p, VALUE handler) {
 	char *sentence_begin = NULL, *sentence_end = NULL;
 	
 	//RMC
-	int rmc_valid = 0;
-	VALUE knot_speed, course, magnetic_variation;
+	bool rmc_valid = 0;
+	Double knot_speed, course, magnetic_variation;
 	//GSV
-	VALUE satellites = Qnil, snr_db = Qnil;
+	satellite_list satellites;
+	Int snr_db;
 	int total_gsv_number, current_gsv_number, total_satellites, satellite_number, elevation, azimuth;
+	/*
 	//GSA
 	int gsa_manual, gsa_mode, gsa_prn_index;
 	VALUE gsa_pdop = Qnil, gsa_hdop = Qnil, gsa_vdop = Qnil;
@@ -140,13 +138,14 @@ void nmea_scanner(char *p, VALUE handler) {
 	VALUE psrf_key = Qnil, psrf_value = Qnil;
 	//VTG
 	VALUE true_course = Qnil, magnetic_course = Qnil, vtg_knot_speed = Qnil, vtg_kmph_speed = Qnil, vtg_mode = Qnil;
-	
+	*/
 	%% write init;
 	
 	pe = p + sentence_len;
 	%% write exec;
 	if(cs == NMEA_error) {
-		rb_raise(eParseError, "PARSE ERROR on line %d: '%s'\n", line_counter, p);
+		return false;
 	}
+	return true;
 }
-
+}
