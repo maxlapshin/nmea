@@ -178,7 +178,7 @@ class TestScanLines < Test::Unit::TestCase
   end
   
   handler :gll, :latitude, :longitude, :time
-  def _test_gll
+  def test_gll
     empty_gll = "$GPGLL,,,,,192642.609,V*1D"
     NMEA.scan(empty_gll, self)
     assert_equal 1, @gll_called

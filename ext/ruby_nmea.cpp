@@ -113,6 +113,13 @@ namespace NMEA {
 				make_double(knot_speed), make_double(kmph_speed), make_vtg_mode(mode));
 		}
 		
+		virtual void gll(Time& time, Angle& latitude, Angle& longitude) { 
+			if(!rb_respond_to(handler, id_gll)) return;
+			if(!load_constants()) return;
+			CALL(handler, id_gll, 3, make_time(time), make_angle(latitude, cLatitude), make_angle(longitude, cLongitude));
+		}
+		
+		
 		VALUE make_gps_quality(GGA_FIX gps_quality) {
 			if(GGA_INVALID == gps_quality) return ID2SYM(rb_intern("invalid"));
 			if(GGA_GPS == gps_quality) return ID2SYM(rb_intern("gps"));

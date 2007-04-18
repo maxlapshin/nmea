@@ -83,7 +83,7 @@ namespace NMEA {
 			Double& altitude, Double& geoidal_height, Double& dgps_data_age, Int& dgps_station_id) = 0;
 		virtual void psrftxt(std::string& key, std::string& value) = 0;
 		virtual void vtg(Double& true_course, Double& magnetic_course, Double& knot_speed, Double& kmph_speed, VTG_MODE mode) = 0;
-	  //handler :gll, :latitude, :longitude, :time
+		virtual void gll(Time& time, Angle& latitude, Angle& longitude) = 0;
 		virtual ~Handler() {};
 	};
 	

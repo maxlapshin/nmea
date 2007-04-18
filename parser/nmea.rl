@@ -86,10 +86,9 @@ namespace NMEA {
 	include "gga.rl";
 	include "psrftxt.rl";
 	include "vtg.rl";
-#	include "gll.rl";
+	include "gll.rl";
 	
-#	sentence = zlen %sentence_begin rmc %read_rmc | gsv %read_gsv | gsa %read_gsa | gga %read_gga | psrftxt %read_psrftxt | vtg %read_vtg | gll %read_gll;
-	sentence = zlen %sentence_begin rmc %read_rmc | gsv %read_gsv | gsa %read_gsa | gga %read_gga | psrftxt %read_psrftxt | vtg %read_vtg;
+	sentence = zlen %sentence_begin rmc %read_rmc | gsv %read_gsv | gsa %read_gsa | gga %read_gga | psrftxt %read_psrftxt | vtg %read_vtg | gll %read_gll;
 	main := sentence newline;
 }%%
 
