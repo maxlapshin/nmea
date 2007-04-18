@@ -74,8 +74,9 @@ namespace NMEA {
 		unsigned int sum_provided;
 		sscanf(checksum, "%x", &sum_provided);
 		if(sum_provided != sum) {
-			//throw(eDataError, "Checksum didn't match: provided is %d, calculated is %d", sum_provided, sum);
-			return false;
+			char buf[BUFSIZ];
+			snprintf(buf, BUFSIZ, "Checksum didn't match: provided is %d, calculated is %d", sum_provided, sum);
+			throw DataError(buf);
 		}
 	}
 	checksum = '*' @{sentence_end = p; } alnum @{checksum[0] = fc;} alnum @check_sum;
@@ -87,8 +88,9 @@ namespace NMEA {
 	include "psrftxt.rl";
 	include "vtg.rl";
 	include "gll.rl";
+	include "bod.rl";
 	
-	sentence = zlen %sentence_begin rmc %read_rmc | gsv %read_gsv | gsa %read_gsa | gga %read_gga | psrftxt %read_psrftxt | vtg %read_vtg | gll %read_gll;
+	sentence = zlen %sentence_begin rmc %read_rmc | gsv %read_gsv | gsa %read_gsa | gga %read_gga | psrftxt %read_psrftxt | vtg %read_vtg | gll %read_gll | bod %read_bod;
 	main := sentence newline;
 }%%
 
@@ -138,6 +140,8 @@ bool scan(char *p, Handler& handler) {
 	//VTG
 	Double true_course, magnetic_course, vtg_knot_speed, vtg_kmph_speed;
 	VTG_MODE vtg_mode = VTG_DEFAULT;
+	//BOD
+	std::string wpt_to, wpt_from;
 	%% write init;
 	
 	pe = p + sentence_len;

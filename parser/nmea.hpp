@@ -6,14 +6,28 @@
 #include <stdlib.h>
 #include <time.h>
 #include <math.h>
+#include <stdarg.h>
 #include <vector>
 #include <string>
+#include <exception>
 
 
 namespace NMEA {
-	class Error {};
-	class ParseError : Error {};
-	class DataError : Error {};
+	class Error {
+	public:
+		char buf[BUFSIZ];
+		Error(const char* msg) {
+			strncpy(buf, msg, BUFSIZ);
+		}
+	};
+	class ParseError : public Error { 
+	public:
+		ParseError(const char* msg) : Error(msg) {}
+	};
+	class DataError : public Error {
+	public:
+		DataError(const char* msg) : Error(msg) {}
+	};
 	
 	template<typename type>
 	struct Value {
@@ -84,6 +98,7 @@ namespace NMEA {
 		virtual void psrftxt(std::string& key, std::string& value) = 0;
 		virtual void vtg(Double& true_course, Double& magnetic_course, Double& knot_speed, Double& kmph_speed, VTG_MODE mode) = 0;
 		virtual void gll(Time& time, Angle& latitude, Angle& longitude) = 0;
+		virtual void bod(Double& true_degrees, Double& magnetic_degrees, std::string& to, std::string& from) = 0;
 		virtual ~Handler() {};
 	};
 	

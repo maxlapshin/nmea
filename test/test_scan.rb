@@ -192,4 +192,23 @@ class TestScanLines < Test::Unit::TestCase
     assert_equal GPS::Latitude.new(55, 46.5059), @latitude
     assert_equal GPS::Longitude.new(37, 41.1635), @longitude
   end
+  
+  handler :bod, :true_course, :magnetic, :to, :from
+  def test_bod
+    bod1 = "$GPBOD,099.3,T,105.6,M,POINTB,*48"
+    NMEA.scan(bod1, self)
+    assert_equal 1, @bod_called
+    assert_equal 99.3, @true_course
+    assert_equal 105.6, @magnetic
+    assert_equal "POINTB", @to
+    assert_equal nil, @from
+    
+    bod2 = "$GPBOD,097.0,T,103.2,M,POINTB,POINTA*4A"
+    NMEA.scan(bod2, self)
+    assert_equal 2, @bod_called
+    assert_equal 97, @true_course
+    assert_equal 103.2, @magnetic
+    assert_equal "POINTB", @to
+    assert_equal "POINTA", @from
+  end
 end

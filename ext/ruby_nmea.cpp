@@ -29,7 +29,7 @@ VALUE frame_call(const char *file, const int line, const char* func, VALUE objec
 
 VALUE mGPS, mNMEA, cLatitude, cLongitude, cTime, eParseError, eDataError, cSatelliteInfo;
 ID id_GPS, id_Latitude, id_Longitude, id_new, id_rmc;
-ID id_gsv, id_gsa, id_gga, id_psrftxt, id_vtg, id_gll;
+ID id_gsv, id_gsa, id_gga, id_psrftxt, id_vtg, id_gll, id_bod;
 VALUE id_start, id_continue, id_finish;
 VALUE id_manual, id_automatic, id_no_fix, id_2d, id_3d;
 
@@ -119,6 +119,11 @@ namespace NMEA {
 			CALL(handler, id_gll, 3, make_time(time), make_angle(latitude, cLatitude), make_angle(longitude, cLongitude));
 		}
 		
+		virtual void bod(Double& true_degrees, Double& magnetic_degrees, std::string& to, std::string& from) {
+			if(!rb_respond_to(handler, id_bod)) return;
+			CALL(handler, id_bod, 4, make_double(true_degrees), make_double(magnetic_degrees), make_strict_string(to), make_strict_string(from));
+		}
+		
 		
 		VALUE make_gps_quality(GGA_FIX gps_quality) {
 			if(GGA_INVALID == gps_quality) return ID2SYM(rb_intern("invalid"));
@@ -169,6 +174,11 @@ namespace NMEA {
 			return rb_str_new2(s.c_str());
 		}
 		
+		VALUE make_strict_string(std::string &s) {
+			if(!s.c_str() || !s.size()) return Qnil;
+			return rb_str_new2(s.c_str());
+		}
+		
 		VALUE make_string_value(std::string &s) {
 			if(!s.c_str() || !s.size()) return Qtrue;
 			return rb_str_new2(s.c_str());
@@ -181,6 +191,14 @@ namespace NMEA {
 			if(VTG_ESTIMATED == mode) return ID2SYM(rb_intern("estimated"));
 			if(VTG_INVALID == mode) return ID2SYM(rb_intern("invalid"));
 			return INT2FIX((int)mode);
+		}
+		
+		VALUE exception_klass(Error& error) { return rb_eStandardError;	}
+		VALUE exception_klass(ParseError& error) { return eParseError; }
+		VALUE exception_klass(DataError& error) { return eDataError; }
+		
+		void do_throw(Error& error) {
+		    rb_exc_raise(rb_exc_new2(exception_klass(error), error.buf));
 		}
 	};
 }
@@ -200,7 +218,12 @@ static VALUE scan(VALUE self, VALUE sentence, VALUE handler) {
 		ptr = ptr_copy;
 	}
 	NMEA::RubyHandler h(handler);
-	NMEA::scan(ptr, h);
+	try {
+		NMEA::scan(ptr, h);
+	}
+	catch(NMEA::Error& e) {
+		h.do_throw(e);
+	}
 	return Qnil;
 }
 
@@ -228,6 +251,7 @@ void Init_nmea_bin() {
 	id_3d = ID2SYM(rb_intern("gps_3d"));
 	id_gga = rb_intern("gga");
 	id_gll = rb_intern("gll");
+	id_bod = rb_intern("bod");
 	cLatitude = Qnil;
 	cLongitude = Qnil;
 	cTime = rb_const_get(rb_cObject, rb_intern("Time"));
