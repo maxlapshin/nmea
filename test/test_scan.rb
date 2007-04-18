@@ -138,7 +138,7 @@ class TestScanLines < Test::Unit::TestCase
     @psrf[key] = (value || true)
   end
   
-  def _test_psrftxt
+  def test_psrftxt
     @psrf = {}
     data = [
       "$PSRFTXT,Version:GSW3.2.2_3.1.00.12-SDK003P1.01a",
@@ -166,7 +166,7 @@ class TestScanLines < Test::Unit::TestCase
   end
   
   handler :vtg, :true_course, :magnetic_course, :knot_speed, :kmph_speed, :mode
-  def _test_vtg
+  def test_vtg
     good_vtg = "$GPVTG,225.29,T,,M,2.86,N,5.3,K*64"
     NMEA.scan(good_vtg, self)
     assert_equal 1, @vtg_called

@@ -102,6 +102,17 @@ namespace NMEA {
 				make_double(dgps_data_age), make_int(dgps_station_id));
 		}
 		
+		virtual void psrftxt(std::string& key, std::string& value) {
+			if(!rb_respond_to(handler, id_psrftxt)) return;
+			CALL(handler, id_psrftxt, 2, make_string(key), make_string_value(value));
+		}
+		
+		virtual void vtg(Double& true_course, Double& magnetic_course, Double& knot_speed, Double& kmph_speed, VTG_MODE mode) {
+			if(!rb_respond_to(handler, id_vtg)) return;
+			CALL(handler, id_vtg, 5, make_double(true_course), make_double(magnetic_course),
+				make_double(knot_speed), make_double(kmph_speed), make_vtg_mode(mode));
+		}
+		
 		VALUE make_gps_quality(GGA_FIX gps_quality) {
 			if(GGA_INVALID == gps_quality) return ID2SYM(rb_intern("invalid"));
 			if(GGA_GPS == gps_quality) return ID2SYM(rb_intern("gps"));
@@ -144,6 +155,25 @@ namespace NMEA {
 				rb_ary_push(s, sat);
 			}
 			return s;
+		}
+		
+		VALUE make_string(std::string &s) {
+			if(!s.c_str()) return Qnil;
+			return rb_str_new2(s.c_str());
+		}
+		
+		VALUE make_string_value(std::string &s) {
+			if(!s.c_str() || !s.size()) return Qtrue;
+			return rb_str_new2(s.c_str());
+		}
+		
+		VALUE make_vtg_mode(VTG_MODE mode) {
+			if(VTG_DEFAULT == mode) return Qnil;
+			if(VTG_AUTONOMUS == mode) return ID2SYM(rb_intern("autonomus"));
+			if(VTG_DIFFERENTIAL == mode) return ID2SYM(rb_intern("differential"));
+			if(VTG_ESTIMATED == mode) return ID2SYM(rb_intern("estimated"));
+			if(VTG_INVALID == mode) return ID2SYM(rb_intern("invalid"));
+			return INT2FIX((int)mode);
 		}
 	};
 }

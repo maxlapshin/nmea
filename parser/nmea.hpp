@@ -7,6 +7,7 @@
 #include <time.h>
 #include <math.h>
 #include <vector>
+#include <string>
 
 
 namespace NMEA {
@@ -70,6 +71,7 @@ namespace NMEA {
 	enum GSV_FLAG {GSV_START, GSV_CONTINUE, GSV_END};
 	enum GSA_MODE {GSA_NO_FIX = 1, GSA_2D, GSA_3D};
 	enum GGA_FIX {GGA_INVALID, GGA_GPS, GGA_DGPS, GGA_PPS, GGA_RTK, GGA_FLOATRTK, GGA_ESTIMATED, GGA_MANUAL, GGA_SIMULATION};
+	enum VTG_MODE {VTG_DEFAULT, VTG_AUTONOMUS, VTG_DIFFERENTIAL, VTG_ESTIMATED, VTG_INVALID};
 	
 	class Handler {
 	public:
@@ -79,8 +81,8 @@ namespace NMEA {
 		virtual void gga(Time& time, Angle& latitude, Angle& longitude, 
 			GGA_FIX gps_quality, Int& active_satellite_count, Double& hdop, 
 			Double& altitude, Double& geoidal_height, Double& dgps_data_age, Int& dgps_station_id) = 0;
-	  //def psrftxt(key, value)
-	  //handler :vtg, :true_course, :magnetic_course, :knot_speed, :kmph_speed, :mode
+		virtual void psrftxt(std::string& key, std::string& value) = 0;
+		virtual void vtg(Double& true_course, Double& magnetic_course, Double& knot_speed, Double& kmph_speed, VTG_MODE mode) = 0;
 	  //handler :gll, :latitude, :longitude, :time
 		virtual ~Handler() {};
 	};

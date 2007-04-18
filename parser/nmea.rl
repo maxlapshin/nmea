@@ -84,12 +84,12 @@ namespace NMEA {
 	include "gsv.rl";
 	include "gsa.rl";
 	include "gga.rl";
-#	include "psrftxt.rl";
-#	include "vtg.rl";
+	include "psrftxt.rl";
+	include "vtg.rl";
 #	include "gll.rl";
 	
 #	sentence = zlen %sentence_begin rmc %read_rmc | gsv %read_gsv | gsa %read_gsa | gga %read_gga | psrftxt %read_psrftxt | vtg %read_vtg | gll %read_gll;
-	sentence = zlen %sentence_begin rmc %read_rmc | gsv %read_gsv | gsa %read_gsa | gga %read_gga;
+	sentence = zlen %sentence_begin rmc %read_rmc | gsv %read_gsv | gsa %read_gsa | gga %read_gga | psrftxt %read_psrftxt | vtg %read_vtg;
 	main := sentence newline;
 }%%
 
@@ -134,12 +134,11 @@ bool scan(char *p, Handler& handler) {
 	Int dgps_station_id, active_satellite_count;
 	Double altitude, geoidal_height, dgps_data_age;
 	char altitude_units, geoidal_height_units;
-	/*
 	//PSRFTXT
-	VALUE psrf_key = Qnil, psrf_value = Qnil;
+	std::string psrf_key, psrf_value;
 	//VTG
-	VALUE true_course = Qnil, magnetic_course = Qnil, vtg_knot_speed = Qnil, vtg_kmph_speed = Qnil, vtg_mode = Qnil;
-	*/
+	Double true_course, magnetic_course, vtg_knot_speed, vtg_kmph_speed;
+	VTG_MODE vtg_mode = VTG_DEFAULT;
 	%% write init;
 	
 	pe = p + sentence_len;
