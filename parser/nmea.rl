@@ -82,22 +82,21 @@ namespace NMEA {
 
 	include "rmc.rl";
 	include "gsv.rl";
-#	include "gsa.rl";
-#	include "gga.rl";
+	include "gsa.rl";
+	include "gga.rl";
 #	include "psrftxt.rl";
 #	include "vtg.rl";
 #	include "gll.rl";
 	
 #	sentence = zlen %sentence_begin rmc %read_rmc | gsv %read_gsv | gsa %read_gsa | gga %read_gga | psrftxt %read_psrftxt | vtg %read_vtg | gll %read_gll;
-	sentence = zlen %sentence_begin rmc %read_rmc | gsv %read_gsv;
+	sentence = zlen %sentence_begin rmc %read_rmc | gsv %read_gsv | gsa %read_gsa | gga %read_gga;
 	main := sentence newline;
 }%%
 
 
 %% write data nofinal;
 
-
-bool nmea_scanner(char *p, Handler& handler) {
+bool scan(char *p, Handler& handler) {
 	char *pe;
 	int cs;
 	
@@ -123,17 +122,19 @@ bool nmea_scanner(char *p, Handler& handler) {
 	//GSV
 	satellite_list satellites;
 	Int snr_db;
-	int total_gsv_number, current_gsv_number, total_satellites, satellite_number, elevation, azimuth;
-	/*
+	int total_gsv_number = 0, current_gsv_number = 0, total_satellites = 0, satellite_number = 0, elevation = 0, azimuth = 0;
 	//GSA
-	int gsa_manual, gsa_mode, gsa_prn_index;
-	VALUE gsa_pdop = Qnil, gsa_hdop = Qnil, gsa_vdop = Qnil;
-	VALUE gsa_prns[12];
+	bool gsa_automatic;
+	GSA_MODE gsa_mode;
+	int gsa_prn_index = 0;
+	Double gsa_pdop, gsa_hdop, gsa_vdop;
+	satellite_numbers gsa_prns;
 	//GGA
-	int gps_quality, dgps_station_id;
-	VALUE active_satellite_count = Qnil;
-	VALUE altitude = Qnil, geoidal_height = Qnil, dgps_data_age = Qnil;
+	GGA_FIX gps_quality;
+	Int dgps_station_id, active_satellite_count;
+	Double altitude, geoidal_height, dgps_data_age;
 	char altitude_units, geoidal_height_units;
+	/*
 	//PSRFTXT
 	VALUE psrf_key = Qnil, psrf_value = Qnil;
 	//VTG
@@ -149,3 +150,4 @@ bool nmea_scanner(char *p, Handler& handler) {
 	return true;
 }
 }
+

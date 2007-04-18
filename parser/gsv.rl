@@ -27,11 +27,11 @@
 	sv_info = sv_prn_number elevation azimuth snr_db;
 	
 	action read_gsv {
-		int flag = 1;
+		GSV_FLAG flag = GSV_CONTINUE;
 		if(current_gsv_number == 1) {
-			flag = 2;
+			flag = GSV_START;
 		} else if(current_gsv_number == total_gsv_number) {
-			flag = 3;
+			flag = GSV_END;
 		}
 		handler.gsv(flag, satellites);
 		satellites.empty();

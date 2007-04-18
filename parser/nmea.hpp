@@ -65,21 +65,27 @@ namespace NMEA {
 	};
 	
 	typedef std::vector<SatelliteInfo> satellite_list;
-	typedef std::vector<Int> satellite_numbers;
-
+	typedef Int satellite_numbers[12];
+	
+	enum GSV_FLAG {GSV_START, GSV_CONTINUE, GSV_END};
+	enum GSA_MODE {GSA_NO_FIX = 1, GSA_2D, GSA_3D};
+	enum GGA_FIX {GGA_INVALID, GGA_GPS, GGA_DGPS, GGA_PPS, GGA_RTK, GGA_FLOATRTK, GGA_ESTIMATED, GGA_MANUAL, GGA_SIMULATION};
 	
 	class Handler {
 	public:
 		virtual void rmc(Time& time, Angle& latitude, Angle& longitude, Double& speed, Double& course, Double& magnetic_variation) = 0;
-		virtual void gsv(int flag, satellite_list& satellites) = 0;
-		virtual void gsa(bool mode_automatic, Int& mode, satellite_numbers& satellites, Double& pdop, Double& hdop, Double& vdop) = 0;
-		
-	  //handler :gga, :time, :latitude, :longitude, :gps_quality, :active_satellite_count, :hdop, :altitude, :geoidal_height, :dgps_data_age, :dgps_station_id
+		virtual void gsv(GSV_FLAG flag, satellite_list& satellites) = 0;
+		virtual void gsa(bool mode_automatic, GSA_MODE mode, satellite_numbers& satellites, Double& pdop, Double& hdop, Double& vdop) = 0;
+		virtual void gga(Time& time, Angle& latitude, Angle& longitude, 
+			GGA_FIX gps_quality, Int& active_satellite_count, Double& hdop, 
+			Double& altitude, Double& geoidal_height, Double& dgps_data_age, Int& dgps_station_id) = 0;
 	  //def psrftxt(key, value)
 	  //handler :vtg, :true_course, :magnetic_course, :knot_speed, :kmph_speed, :mode
 	  //handler :gll, :latitude, :longitude, :time
 		virtual ~Handler() {};
 	};
+	
+	bool scan(char *p, Handler& handler);
 }
 
 #endif /* _NMEA_H_ */

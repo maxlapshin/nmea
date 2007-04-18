@@ -13,6 +13,8 @@ extern ID id_GPS, id_Latitude, id_Longitude, id_new, id_rmc, id_gsv, id_gsa, id_
 extern VALUE id_start, id_continue, id_finish, id_manual, id_automatic, id_no_fix, id_2d, id_3d;
 extern VALUE id_autonomus, id_differential, id_estimated, id_invalid; 
 
+#define THROW(message, ...) wiretap_throw(__FILE__, __LINE__, message, ##__VA_ARGS__)
+
 
 int load_constants();
 void nmea_scanner(char *buffer, VALUE handler);
