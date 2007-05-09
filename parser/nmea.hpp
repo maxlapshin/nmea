@@ -102,7 +102,7 @@ namespace NMEA {
 		virtual ~Handler() {};
 	};
 	
-	bool scan(char *p, Handler& handler);
+	bool scan(char *p, Handler& handler) throw (Error);
 }
 
 #endif /* _NMEA_H_ */

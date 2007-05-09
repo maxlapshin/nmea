@@ -15,7 +15,7 @@ class TestScanLines < Test::Unit::TestCase
     invalid_rmc = "$GPRMC,072458.748,V,,,,,,,080407,,*23"
     NMEA.scan(invalid_rmc, self)
     assert_equal 1, @rmc_called, "RMC handler should be called"
-    assert_equal Time.local(2007, 4, 8, 11, 24, 58, 748), @utc
+    assert_equal Time.gm(2007, 4, 8, 7, 24, 58, 748), @utc
     assert_equal nil, @latitude
     assert_equal nil, @longitude
     assert_equal nil, @speed
@@ -25,12 +25,22 @@ class TestScanLines < Test::Unit::TestCase
     valid_rmc = "$GPRMC,072640.711,A,5546.5537,N,03741.2054,E,0.00,,080407,,*12"
     NMEA.scan(valid_rmc, self)
     assert_equal 2, @rmc_called, "RMC handler should be called"
-    assert_equal Time.local(2007, 4, 8, 11, 26, 40, 711), @utc
+    assert_equal Time.gm(2007, 4, 8, 7, 26, 40, 711), @utc
     assert_equal GPS::Latitude.new(55, 46.5537), @latitude
     assert_equal GPS::Longitude.new(37, 41.2054), @longitude
     assert_equal 0, @speed
     assert_equal nil, @course
     assert_equal nil, @magnetic_variation
+    
+    strange_rmc = "$GPRMC,135444,A,3815.4477,N,02349.5804,E,10412.9,243.3,090507,5,E,A*B"
+    NMEA.scan(strange_rmc, self)
+    assert_equal 3, @rmc_called, "RMC handled should be called"
+    assert_equal Time.gm(2007, 5, 9, 13, 54, 44), @utc
+    assert_equal GPS::Latitude.new(38, 15.4477), @latitude
+    assert_equal GPS::Longitude.new(23, 49.5804), @longitude
+    assert_equal 10412.9, @speed
+    assert_equal 243.3, @course
+    assert_equal 5, @magnetic_variation
   end
   
   def gsv(flag, satellites)
@@ -211,4 +221,78 @@ class TestScanLines < Test::Unit::TestCase
     assert_equal "POINTB", @to
     assert_equal "POINTA", @from
   end
+  
+  # TODO
+  # $GPAAM,A,A,0.10,N,WPTNME*43
+  # handler :aam, 
+  #
+  # $GPALM,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,*CC
+  # $GPALM,1,1,15,1159,00,441d,4e,16be,fd5e,a10c9f,4a2da4,686e81,58cbe1,0a4,001*5B
+  #
+  # $GPAPB,A,A,0.10,R,N,V,V,011,M,DEST,011,M,011,M*82
+  #
+  # $GPBWC,081837,,,,,,T,,M,,N,*13
+  # $GPBWC,220516,5130.02,N,00046.34,W,213.8,T,218.0,M,0004.6,N,EGLM*11
+  #
+  # $GPGRS,024603.00,1,-1.8,-2.7,0.3,,,,,,,,,*6C
+  #
+  # $GPGST,024603.00,3.2,6.6,4.7,47.3,5.8,5.6,22.0*58
+  #
+  # $GPHDT,x.x,T
+  #
+  # $GPMSK,318.0,A,100,M,2*45
+  #
+  # $GPMSS,55,27,318.0,100,*66
+  # $GPMSS,0.0,0.0,0.0,25,2*6D
+  # 
+  # $GPR00,EGLL,EGLM,EGTB,EGUB,EGTK,MBOT,EGTB,,,,,,,*58
+  # $GPR00,MINST,CHATN,CHAT1,CHATW,CHATM,CHATE,003,004,005,006,007,,,*05
+  #
+  # $GPRMA,A,lll,N,lll,W,x,y,ss.s,ccc,vv.v,W*hh
+  #
+  # $GPRMB,A,0.66,L,003,004,4917.24,N,12309.57,W,001.3,052.5,000.5,V*0B
+  # $GPRMB,A,4.08,L,EGLL,EGLM,5130.02,N,00046.34,W,004.6,213.9,122.9,A*3D
+  # $GPRMB,A,x.x,a,c--c,d--d,llll.ll,e,yyyyy.yy,f,g.g,h.h,i.i,j*kk
+  # 
+  # $GPRTE,2,1,c,0,PBRCPK,PBRTO,PTELGR,PPLAND,PYAMBU,PPFAIR,PWARRN,PMORTL,PLISMR*73
+  # $GPRTE,2,2,c,0,PCRESY,GRYRIE,GCORIO,GWERR,GWESTG,7FED*34
+  #
+  # $GPTRF,hhmmss.ss,xxxxxx,llll.ll,a,yyyyy.yy,a,x.x,x.x,x.x,x.x,xxx
+  #
+  # $GPSTN,xx
+  # 
+  # $--VBW,x.x,x.x,A,x.x,x.x,A
+  # 
+  # $GPWPL,4917.16,N,12310.64,W,003*65
+  # $GPWPL,5128.62,N,00027.58,W,EGLL*59
+  # 
+  # $GPXTE,A,A,0.67,L,N
+  # $GPXTE,A,A,4.07,L,N*6D
+  #
+  # $GPZDA,hhmmss.ss,xx,xx,xxxx,xx,xx
+  # $GPZDA,024611.08,25,03,2002,00,00*6A
+  #
+  # ====== GARMIN ========
+  # 
+  # $HCHDG,101.1,,,7.1,W*3C
+  #
+  # $PGRMB,1,2,3,4,5,6,7,8,9*HH
+  # 
+  # $PGRME,15.0,M,45.0,M,25.0,M*22
+  #
+  # $PGRMF,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15*HH
+  #
+  # $PGRMM,Astrln Geod '66*51
+  # $PGRMM,NAD27 Canada*2F
+  # 
+  # $PGRMT,1,2,3,4,5,6,7,8,9*HH
+  # 
+  # $PGRMV,1,2,3*HH
+  #
+  # $PGRMZ,246,f,3*1B
+  #
+  # $PGRMZ,93,f,3*21
+  # $PGRMZ,201,f,3*18
+  # 
+  # 
 end

@@ -24,7 +24,8 @@ VALUE frame_call(const char *file, const int line, const char* func, VALUE objec
 	ruby_frame = frame.prev;
 	return retval;
 }
-#define CALL(object, method, count, ...) frame_call(__FILE__, __LINE__, __func__, object, method, count, ##__VA_ARGS__)
+//#define CALL(object, method, count, ...) frame_call(__FILE__, __LINE__, __func__, object, method, count, ##__VA_ARGS__)
+#define CALL(object, method, count, ...) rb_funcall(object, method, count, ##__VA_ARGS__)
 
 
 VALUE mGPS, mNMEA, cLatitude, cLongitude, cTime, eParseError, eDataError, cSatelliteInfo;
@@ -56,12 +57,25 @@ namespace NMEA {
 		void rmc(Time& time, Angle& latitude, Angle& longitude, Double& speed, Double& course, Double& magnetic_variation) {
 			if(!rb_respond_to(handler, id_rmc)) return;
 			if(!load_constants()) return;
+			VALUE _t, _l, _ll, _s, _c, _mv;
+			_t = make_time(time);
+			_l = make_angle(latitude, cLatitude);
+			_ll = make_angle(longitude, cLongitude);
+			_s = make_double(speed);
+			_c = make_double(course);
+			_mv = make_double(magnetic_variation);
+			if(_t == 0xbfffe108 || _l == 0xbfffe108 || _ll == 0xbfffe108 || _s == 0xbfffe108 || _c == 0xbfffe108 || _mv == 0xbfffe108) {
+				printf("Fuck!!!!\n");
+			}
+			CALL(handler, id_rmc, 6, _t, _l, _ll, _s, _c, _mv); 
+#if 0				
 			CALL(handler, id_rmc, 6, make_time(time), 
 				make_angle(latitude, cLatitude), make_angle(longitude, cLongitude), 
 				make_double(speed), make_double(course), make_double(magnetic_variation));
+#endif
 		}
 		void gsv(GSV_FLAG flag, satellite_list& satellites) {
-			if(!rb_respond_to(handler, id_rmc)) return;
+			if(!rb_respond_to(handler, id_gsv)) return;
 			
 			VALUE _flag = id_continue;
 			if(flag == GSV_START) {
@@ -140,13 +154,13 @@ namespace NMEA {
 	
 		VALUE make_time(Time& t) {
 			return CALL(rb_cTime, rb_intern("utc"), 7, 
-				INT2FIX(t.year ?: 1970), INT2FIX(t.month ?: 1), INT2FIX(t.day?:1), 
-				INT2FIX(t.hour), INT2FIX(t.minute), INT2FIX(t.second), INT2FIX(t.usec));
+				INT2NUM(t.year ?: 1970), INT2NUM(t.month ?: 1), INT2NUM(t.day?:1), 
+				INT2NUM(t.hour), INT2NUM(t.minute), INT2NUM(t.second), INT2NUM(t.usec));
 		}
 		
 		VALUE make_angle(Angle& angle, VALUE klass) {
 			if(angle.nil) return Qnil;
-			return CALL(klass, id_new, 2, INT2FIX(angle.value.degrees), rb_float_new(angle.value.minutes));
+			return CALL(klass, id_new, 2, INT2NUM(angle.value.degrees), rb_float_new(angle.value.minutes));
 		}
 		
 		VALUE make_double(Double& d) {

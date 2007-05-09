@@ -34,7 +34,7 @@ namespace NMEA {
 	string = space* <: (nmea_char @add_char)*;
 	key_string = space* <: ((nmea_char - [:]) @add_char)+;
 	
-	utc_time = bcd @{ utc.hour = bcd; } bcd @{ utc.minute = bcd;} bcd @{ utc.second = bcd; } "." b3cd @{ utc.usec = bcd;} comma;
+	utc_time = bcd @{ utc.hour = bcd; } bcd @{ utc.minute = bcd;} bcd @{ utc.second = bcd;} ("." b3cd @{ utc.usec = bcd;})? comma;
 	utc_date = bcd @{ utc.day = bcd; } bcd @{ utc.month = bcd;} bcd @{ utc.year = bcd > 70 ? 1900+bcd : 2000+bcd;};
 	
 	action set_degrees {
@@ -97,15 +97,13 @@ namespace NMEA {
 
 %% write data nofinal;
 
-bool scan(char *p, Handler& handler) {
+bool scan(char *p, Handler& handler) throw (Error) {
 	char *pe;
 	int cs;
 	
-	int line_counter = 0;
 	int current_digit = 0, current_frac = 0;
 	double current_float = 0;
 	int current_degrees = 0;
-	double current_minutes = 0.0;
 	int bcd = 0;
 	Time utc;
 	Angle latitude, longitude;
