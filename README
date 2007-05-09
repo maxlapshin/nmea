@@ -60,3 +60,10 @@ which initializer, takes two arguments: degrees and minutes. You can use this ex
 	    end
 	  end
 	end
+
+
+Supported devices.
+
+Ruby NMEA has full support of Globalsat BU-353 device (http://www.usglobalsat.com/item.asp?itemid=60&catid=17).
+
+NMEA syntax is assumed to be as in document nmea.html, taken from http://www.werple.net.au/~gnb/gps/nmea.html

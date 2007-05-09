@@ -64,9 +64,6 @@ namespace NMEA {
 			_s = make_double(speed);
 			_c = make_double(course);
 			_mv = make_double(magnetic_variation);
-			if(_t == 0xbfffe108 || _l == 0xbfffe108 || _ll == 0xbfffe108 || _s == 0xbfffe108 || _c == 0xbfffe108 || _mv == 0xbfffe108) {
-				printf("Fuck!!!!\n");
-			}
 			CALL(handler, id_rmc, 6, _t, _l, _ll, _s, _c, _mv); 
 #if 0				
 			CALL(handler, id_rmc, 6, make_time(time), 
