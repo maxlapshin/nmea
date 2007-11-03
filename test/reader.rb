@@ -50,22 +50,21 @@ class WaypointWriter
   
 end
 
-@handler = WaypointWriter.new("points.wpt")
-@f = File.open(File.dirname(__FILE__)+"/parse.log")
+#@handler = WaypointWriter.new("points.wpt")
+@handler = NMEAHandler.new
+@f = File.open(File.dirname(__FILE__)+"/nmea.txt")
 loop do
-#  sentence = SerialPort.try_gets("/dev/tty.usbserial", 4800, 8, 1, SerialPort::NONE)
+  #sentence = SerialPort.try_gets("/dev/tty.usbserial", 4800, 8, 1, SerialPort::NONE)
   sentence = @f.gets
+  #puts sentence
   break unless sentence
   begin
     NMEA.scan(sentence, @handler)
-#    File.open("parse.log", "a") do |f|
-#      f << "#{sentence}"
-#      puts sentence
-#    end if sentence
+#    puts sentence
   rescue NMEA::ParseError => e
-#    File.open("error.log", "a") do |f|
-#      f << "'#{sentence}'\n"
-#    end
+    File.open("error.log", "a") do |f|
+      f << "'#{sentence}'\n"
+    end
     puts "Parse error: '#{sentence}'"
   end
 #  GC.start
