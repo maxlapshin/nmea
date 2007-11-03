@@ -6,7 +6,7 @@ require 'rake/packagetask'
 require 'rake/contrib/rubyforgepublisher'
 
 PKG_NAME = "nmea"
-PKG_VERSION = "0.2"
+PKG_VERSION = "0.3"
 PKG_AUTHOR = "Max Lapshin"
 PKG_EMAIL = "max@maxidoors.ru"
 PKG_HOMEPAGE = "http://maxidoors.ru/"
