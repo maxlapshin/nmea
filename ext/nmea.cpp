@@ -18,6 +18,7 @@ bool scan(char *p, Handler& handler) throw (Error) {
 	char *pe;
 	int cs;
 	
+	int sign = 1;
 	int current_digit = 0, current_frac = 0;
 	double current_float = 0;
 	int current_degrees = 0;
@@ -58,15 +59,15 @@ bool scan(char *p, Handler& handler) throw (Error) {
 	//BOD
 	std::string wpt_to, wpt_from;
 	
-#line 62 "../ext/nmea.cpp"
+#line 63 "../ext/nmea.cpp"
 	{
 	cs = NMEA_start;
 	}
-#line 144 "nmea.rl"
+#line 145 "nmea.rl"
 	
 	pe = p + sentence_len;
 	
-#line 70 "../ext/nmea.cpp"
+#line 71 "../ext/nmea.cpp"
 	{
 	if ( p == pe )
 		goto _out;
@@ -88,10 +89,10 @@ st2:
 	if ( ++p == pe )
 		goto _out2;
 case 2:
-#line 92 "../ext/nmea.cpp"
+#line 93 "../ext/nmea.cpp"
 	switch( (*p) ) {
 		case 71: goto st3;
-		case 80: goto st264;
+		case 80: goto st287;
 	}
 	goto st0;
 st3:
@@ -107,9 +108,9 @@ st4:
 case 4:
 	switch( (*p) ) {
 		case 66: goto st5;
-		case 71: goto st26;
-		case 82: goto st177;
-		case 86: goto st232;
+		case 71: goto st28;
+		case 82: goto st190;
+		case 86: goto st251;
 	}
 	goto st0;
 st5:
@@ -137,12 +138,16 @@ st8:
 	if ( ++p == pe )
 		goto _out8;
 case 8:
-	if ( (*p) == 44 )
-		goto st9;
+	switch( (*p) ) {
+		case 44: goto st9;
+		case 45: goto st24;
+	}
 	if ( 48 <= (*p) && (*p) <= 57 )
-		goto tr13;
+		goto tr14;
 	goto st0;
-tr35:
+tr39:
+#line 28 "nmea.rl"
+	{current_float = current_float*sign; sign = 1;}
 #line 3 "nmea.rl"
 	{true_course = current_float; current_float = 0;}
 	goto st9;
@@ -150,7 +155,7 @@ st9:
 	if ( ++p == pe )
 		goto _out9;
 case 9:
-#line 154 "../ext/nmea.cpp"
+#line 159 "../ext/nmea.cpp"
 	if ( (*p) == 84 )
 		goto st10;
 	goto st0;
@@ -165,12 +170,16 @@ st11:
 	if ( ++p == pe )
 		goto _out11;
 case 11:
-	if ( (*p) == 44 )
-		goto st12;
+	switch( (*p) ) {
+		case 44: goto st12;
+		case 45: goto st20;
+	}
 	if ( 48 <= (*p) && (*p) <= 57 )
-		goto tr17;
+		goto tr19;
 	goto st0;
-tr32:
+tr35:
+#line 28 "nmea.rl"
+	{current_float = current_float*sign; sign = 1;}
 #line 4 "nmea.rl"
 	{magnetic_course = current_float; current_float = 0;}
 	goto st12;
@@ -178,7 +187,7 @@ st12:
 	if ( ++p == pe )
 		goto _out12;
 case 12:
-#line 182 "../ext/nmea.cpp"
+#line 191 "../ext/nmea.cpp"
 	if ( (*p) == 77 )
 		goto st13;
 	goto st0;
@@ -189,7 +198,7 @@ case 13:
 	if ( (*p) == 44 )
 		goto st14;
 	goto st0;
-tr20:
+tr22:
 #line 29 "nmea.rl"
 	{
 		*current_s = (*p);
@@ -201,18 +210,18 @@ st14:
 	if ( ++p == pe )
 		goto _out14;
 case 14:
-#line 205 "../ext/nmea.cpp"
+#line 214 "../ext/nmea.cpp"
 	if ( (*p) == 44 )
 		goto st15;
-	goto tr20;
+	goto tr22;
 st15:
 	if ( ++p == pe )
 		goto _out15;
 case 15:
 	if ( (*p) == 42 )
-		goto tr23;
-	goto tr22;
-tr24:
+		goto tr25;
+	goto tr24;
+tr26:
 #line 29 "nmea.rl"
 	{
 		*current_s = (*p);
@@ -220,7 +229,7 @@ tr24:
 		*current_s = 0;
 	}
 	goto st16;
-tr22:
+tr24:
 #line 4 "nmea.rl"
 	{
 		if(*current_string) wpt_to = current_string;
@@ -238,11 +247,11 @@ st16:
 	if ( ++p == pe )
 		goto _out16;
 case 16:
-#line 242 "../ext/nmea.cpp"
+#line 251 "../ext/nmea.cpp"
 	if ( (*p) == 42 )
-		goto tr25;
-	goto tr24;
-tr23:
+		goto tr27;
+	goto tr26;
+tr25:
 #line 4 "nmea.rl"
 	{
 		if(*current_string) wpt_to = current_string;
@@ -258,7 +267,7 @@ tr23:
 #line 82 "nmea.rl"
 	{sentence_end = p; }
 	goto st17;
-tr25:
+tr27:
 #line 10 "nmea.rl"
 	{
 		if(*current_string) wpt_from = current_string;
@@ -272,17 +281,17 @@ st17:
 	if ( ++p == pe )
 		goto _out17;
 case 17:
-#line 276 "../ext/nmea.cpp"
+#line 285 "../ext/nmea.cpp"
 	if ( (*p) < 65 ) {
 		if ( 48 <= (*p) && (*p) <= 57 )
-			goto tr26;
+			goto tr28;
 	} else if ( (*p) > 90 ) {
 		if ( 97 <= (*p) && (*p) <= 122 )
-			goto tr26;
+			goto tr28;
 	} else
-		goto tr26;
+		goto tr28;
 	goto st0;
-tr26:
+tr28:
 #line 82 "nmea.rl"
 	{checksum[0] = (*p);}
 	goto st18;
@@ -290,17 +299,17 @@ st18:
 	if ( ++p == pe )
 		goto _out18;
 case 18:
-#line 294 "../ext/nmea.cpp"
+#line 303 "../ext/nmea.cpp"
 	if ( (*p) < 65 ) {
 		if ( 48 <= (*p) && (*p) <= 57 )
-			goto tr27;
+			goto tr29;
 	} else if ( (*p) > 90 ) {
 		if ( 97 <= (*p) && (*p) <= 122 )
-			goto tr27;
+			goto tr29;
 	} else
-		goto tr27;
+		goto tr29;
 	goto st0;
-tr27:
+tr29:
 #line 68 "nmea.rl"
 	{
 		checksum[1] = (*p);
@@ -321,38 +330,38 @@ st19:
 	if ( ++p == pe )
 		goto _out19;
 case 19:
-#line 325 "../ext/nmea.cpp"
+#line 334 "../ext/nmea.cpp"
 	switch( (*p) ) {
-		case 10: goto tr28;
-		case 13: goto tr29;
+		case 10: goto tr30;
+		case 13: goto tr31;
 	}
 	goto st0;
-tr28:
+tr30:
 #line 16 "nmea.rl"
 	{
 		handler.bod(true_course, magnetic_course, wpt_to, wpt_from);
 	}
-	goto st275;
-tr77:
+	goto st298;
+tr85:
 #line 8 "nmea.rl"
 	{
 		handler.gga(utc, latitude, longitude, gps_quality, active_satellite_count, gsa_hdop, altitude, geoidal_height, dgps_data_age, dgps_station_id);
 	}
-	goto st275;
-tr134:
+	goto st298;
+tr150:
 #line 4 "nmea.rl"
 	{
 		handler.gll(utc, latitude, longitude);
 	}
-	goto st275;
-tr193:
+	goto st298;
+tr216:
 #line 6 "nmea.rl"
 	{
 		handler.gsa(gsa_automatic, gsa_mode, gsa_prns, gsa_pdop, gsa_hdop, gsa_vdop);
 		gsa_prn_index = 0;
 	}
-	goto st275;
-tr221:
+	goto st298;
+tr248:
 #line 29 "nmea.rl"
 	{
 		GSV_FLAG flag = GSV_CONTINUE;
@@ -364,14 +373,14 @@ tr221:
 		handler.gsv(flag, satellites);
 		satellites.empty();
 	}
-	goto st275;
-tr316:
+	goto st298;
+tr358:
 #line 8 "nmea.rl"
 	{
 		handler.vtg(true_course, magnetic_course, vtg_knot_speed, vtg_kmph_speed, vtg_mode);
 	}
-	goto st275;
-tr342:
+	goto st298;
+tr388:
 #line 3 "nmea.rl"
 	{
 		psrf_key = current_string;
@@ -382,8 +391,8 @@ tr342:
 	{
 		handler.psrftxt(psrf_key, psrf_value);
 	}
-	goto st275;
-tr348:
+	goto st298;
+tr394:
 #line 9 "nmea.rl"
 	{
 		psrf_value = current_string;
@@ -394,39 +403,39 @@ tr348:
 	{
 		handler.psrftxt(psrf_key, psrf_value);
 	}
-	goto st275;
-st275:
+	goto st298;
+st298:
 	if ( ++p == pe )
-		goto _out275;
-case 275:
-#line 403 "../ext/nmea.cpp"
+		goto _out298;
+case 298:
+#line 412 "../ext/nmea.cpp"
 	goto st0;
-tr29:
+tr31:
 #line 16 "nmea.rl"
 	{
 		handler.bod(true_course, magnetic_course, wpt_to, wpt_from);
 	}
-	goto st276;
-tr78:
+	goto st299;
+tr86:
 #line 8 "nmea.rl"
 	{
 		handler.gga(utc, latitude, longitude, gps_quality, active_satellite_count, gsa_hdop, altitude, geoidal_height, dgps_data_age, dgps_station_id);
 	}
-	goto st276;
-tr135:
+	goto st299;
+tr151:
 #line 4 "nmea.rl"
 	{
 		handler.gll(utc, latitude, longitude);
 	}
-	goto st276;
-tr194:
+	goto st299;
+tr217:
 #line 6 "nmea.rl"
 	{
 		handler.gsa(gsa_automatic, gsa_mode, gsa_prns, gsa_pdop, gsa_hdop, gsa_vdop);
 		gsa_prn_index = 0;
 	}
-	goto st276;
-tr222:
+	goto st299;
+tr249:
 #line 29 "nmea.rl"
 	{
 		GSV_FLAG flag = GSV_CONTINUE;
@@ -438,14 +447,14 @@ tr222:
 		handler.gsv(flag, satellites);
 		satellites.empty();
 	}
-	goto st276;
-tr317:
+	goto st299;
+tr359:
 #line 8 "nmea.rl"
 	{
 		handler.vtg(true_course, magnetic_course, vtg_knot_speed, vtg_kmph_speed, vtg_mode);
 	}
-	goto st276;
-tr343:
+	goto st299;
+tr389:
 #line 3 "nmea.rl"
 	{
 		psrf_key = current_string;
@@ -456,8 +465,8 @@ tr343:
 	{
 		handler.psrftxt(psrf_key, psrf_value);
 	}
-	goto st276;
-tr349:
+	goto st299;
+tr395:
 #line 9 "nmea.rl"
 	{
 		psrf_value = current_string;
@@ -468,81 +477,47 @@ tr349:
 	{
 		handler.psrftxt(psrf_key, psrf_value);
 	}
-	goto st276;
-st276:
+	goto st299;
+st299:
 	if ( ++p == pe )
-		goto _out276;
-case 276:
-#line 477 "../ext/nmea.cpp"
+		goto _out299;
+case 299:
+#line 486 "../ext/nmea.cpp"
 	if ( (*p) == 10 )
-		goto st275;
+		goto st298;
 	goto st0;
-tr17:
+st20:
+	if ( ++p == pe )
+		goto _out20;
+case 20:
+	if ( 48 <= (*p) && (*p) <= 57 )
+		goto tr32;
+	goto st0;
+tr19:
 #line 11 "nmea.rl"
 	{
 		current_float = 0;
 		current_digit = current_digit*10 + ((*p) - '0');
 	}
-	goto st20;
-st20:
-	if ( ++p == pe )
-		goto _out20;
-case 20:
-#line 492 "../ext/nmea.cpp"
-	if ( (*p) == 46 )
-		goto tr30;
-	if ( 48 <= (*p) && (*p) <= 57 )
-		goto tr17;
-	goto st0;
-tr30:
-#line 15 "nmea.rl"
+	goto st21;
+tr32:
+#line 28 "nmea.rl"
+	{sign = -1;}
+#line 11 "nmea.rl"
 	{
-		current_frac = 10;
-		current_float = current_digit;
-		current_digit = 0;
+		current_float = 0;
+		current_digit = current_digit*10 + ((*p) - '0');
 	}
 	goto st21;
 st21:
 	if ( ++p == pe )
 		goto _out21;
 case 21:
-#line 510 "../ext/nmea.cpp"
-	if ( 48 <= (*p) && (*p) <= 57 )
-		goto tr31;
-	goto st0;
-tr31:
-#line 20 "nmea.rl"
-	{
-		current_float += ((*p) - '0')*1.0 / current_frac;
-		current_frac *= 10;
-	}
-	goto st22;
-st22:
-	if ( ++p == pe )
-		goto _out22;
-case 22:
-#line 525 "../ext/nmea.cpp"
-	if ( (*p) == 44 )
-		goto tr32;
-	if ( 48 <= (*p) && (*p) <= 57 )
-		goto tr31;
-	goto st0;
-tr13:
-#line 11 "nmea.rl"
-	{
-		current_float = 0;
-		current_digit = current_digit*10 + ((*p) - '0');
-	}
-	goto st23;
-st23:
-	if ( ++p == pe )
-		goto _out23;
-case 23:
-#line 542 "../ext/nmea.cpp"
+#line 517 "../ext/nmea.cpp"
 	if ( (*p) == 46 )
 		goto tr33;
 	if ( 48 <= (*p) && (*p) <= 57 )
-		goto tr13;
+		goto tr19;
 	goto st0;
 tr33:
 #line 15 "nmea.rl"
@@ -551,12 +526,12 @@ tr33:
 		current_float = current_digit;
 		current_digit = 0;
 	}
-	goto st24;
-st24:
+	goto st22;
+st22:
 	if ( ++p == pe )
-		goto _out24;
-case 24:
-#line 560 "../ext/nmea.cpp"
+		goto _out22;
+case 22:
+#line 535 "../ext/nmea.cpp"
 	if ( 48 <= (*p) && (*p) <= 57 )
 		goto tr34;
 	goto st0;
@@ -566,75 +541,115 @@ tr34:
 		current_float += ((*p) - '0')*1.0 / current_frac;
 		current_frac *= 10;
 	}
-	goto st25;
-st25:
+	goto st23;
+st23:
 	if ( ++p == pe )
-		goto _out25;
-case 25:
-#line 575 "../ext/nmea.cpp"
+		goto _out23;
+case 23:
+#line 550 "../ext/nmea.cpp"
 	if ( (*p) == 44 )
 		goto tr35;
 	if ( 48 <= (*p) && (*p) <= 57 )
 		goto tr34;
 	goto st0;
+st24:
+	if ( ++p == pe )
+		goto _out24;
+case 24:
+	if ( 48 <= (*p) && (*p) <= 57 )
+		goto tr36;
+	goto st0;
+tr14:
+#line 11 "nmea.rl"
+	{
+		current_float = 0;
+		current_digit = current_digit*10 + ((*p) - '0');
+	}
+	goto st25;
+tr36:
+#line 28 "nmea.rl"
+	{sign = -1;}
+#line 11 "nmea.rl"
+	{
+		current_float = 0;
+		current_digit = current_digit*10 + ((*p) - '0');
+	}
+	goto st25;
+st25:
+	if ( ++p == pe )
+		goto _out25;
+case 25:
+#line 583 "../ext/nmea.cpp"
+	if ( (*p) == 46 )
+		goto tr37;
+	if ( 48 <= (*p) && (*p) <= 57 )
+		goto tr14;
+	goto st0;
+tr37:
+#line 15 "nmea.rl"
+	{
+		current_frac = 10;
+		current_float = current_digit;
+		current_digit = 0;
+	}
+	goto st26;
 st26:
 	if ( ++p == pe )
 		goto _out26;
 case 26:
-	switch( (*p) ) {
-		case 71: goto st27;
-		case 76: goto st91;
-		case 83: goto st124;
-	}
+#line 601 "../ext/nmea.cpp"
+	if ( 48 <= (*p) && (*p) <= 57 )
+		goto tr38;
 	goto st0;
+tr38:
+#line 20 "nmea.rl"
+	{
+		current_float += ((*p) - '0')*1.0 / current_frac;
+		current_frac *= 10;
+	}
+	goto st27;
 st27:
 	if ( ++p == pe )
 		goto _out27;
 case 27:
-	if ( (*p) == 65 )
-		goto st28;
+#line 616 "../ext/nmea.cpp"
+	if ( (*p) == 44 )
+		goto tr39;
+	if ( 48 <= (*p) && (*p) <= 57 )
+		goto tr38;
 	goto st0;
 st28:
 	if ( ++p == pe )
 		goto _out28;
 case 28:
-	if ( (*p) == 44 )
-		goto st29;
+	switch( (*p) ) {
+		case 71: goto st29;
+		case 76: goto st99;
+		case 83: goto st134;
+	}
 	goto st0;
 st29:
 	if ( ++p == pe )
 		goto _out29;
 case 29:
-	if ( 48 <= (*p) && (*p) <= 57 )
-		goto tr41;
+	if ( (*p) == 65 )
+		goto st30;
 	goto st0;
-tr41:
-#line 24 "nmea.rl"
-	{bcd = 10*((*p) - '0');}
-	goto st30;
 st30:
 	if ( ++p == pe )
 		goto _out30;
 case 30:
-#line 620 "../ext/nmea.cpp"
-	if ( 48 <= (*p) && (*p) <= 57 )
-		goto tr42;
+	if ( (*p) == 44 )
+		goto st31;
 	goto st0;
-tr42:
-#line 24 "nmea.rl"
-	{bcd += (*p) - '0';}
-#line 37 "nmea.rl"
-	{ utc.hour = bcd; }
-	goto st31;
 st31:
 	if ( ++p == pe )
 		goto _out31;
 case 31:
-#line 634 "../ext/nmea.cpp"
 	if ( 48 <= (*p) && (*p) <= 57 )
-		goto tr43;
+		goto tr45;
 	goto st0;
-tr43:
+tr45:
 #line 24 "nmea.rl"
 	{bcd = 10*((*p) - '0');}
 	goto st32;
@@ -642,33 +657,7 @@ st32:
 	if ( ++p == pe )
 		goto _out32;
 case 32:
-#line 646 "../ext/nmea.cpp"
-	if ( 48 <= (*p) && (*p) <= 57 )
-		goto tr44;
-	goto st0;
-tr44:
-#line 24 "nmea.rl"
-	{bcd += (*p) - '0';}
-#line 37 "nmea.rl"
-	{ utc.minute = bcd;}
-	goto st33;
-st33:
-	if ( ++p == pe )
-		goto _out33;
-case 33:
-#line 660 "../ext/nmea.cpp"
-	if ( 48 <= (*p) && (*p) <= 57 )
-		goto tr45;
-	goto st0;
-tr45:
-#line 24 "nmea.rl"
-	{bcd = 10*((*p) - '0');}
-	goto st34;
-st34:
-	if ( ++p == pe )
-		goto _out34;
-case 34:
-#line 672 "../ext/nmea.cpp"
+#line 661 "../ext/nmea.cpp"
 	if ( 48 <= (*p) && (*p) <= 57 )
 		goto tr46;
 	goto st0;
@@ -676,33 +665,85 @@ tr46:
 #line 24 "nmea.rl"
 	{bcd += (*p) - '0';}
 #line 37 "nmea.rl"
-	{ utc.second = bcd;}
+	{ utc.hour = bcd; }
+	goto st33;
+st33:
+	if ( ++p == pe )
+		goto _out33;
+case 33:
+#line 675 "../ext/nmea.cpp"
+	if ( 48 <= (*p) && (*p) <= 57 )
+		goto tr47;
+	goto st0;
+tr47:
+#line 24 "nmea.rl"
+	{bcd = 10*((*p) - '0');}
+	goto st34;
+st34:
+	if ( ++p == pe )
+		goto _out34;
+case 34:
+#line 687 "../ext/nmea.cpp"
+	if ( 48 <= (*p) && (*p) <= 57 )
+		goto tr48;
+	goto st0;
+tr48:
+#line 24 "nmea.rl"
+	{bcd += (*p) - '0';}
+#line 37 "nmea.rl"
+	{ utc.minute = bcd;}
 	goto st35;
 st35:
 	if ( ++p == pe )
 		goto _out35;
 case 35:
-#line 686 "../ext/nmea.cpp"
-	switch( (*p) ) {
-		case 44: goto st36;
-		case 46: goto st89;
-	}
+#line 701 "../ext/nmea.cpp"
+	if ( 48 <= (*p) && (*p) <= 57 )
+		goto tr49;
 	goto st0;
-tr113:
-#line 37 "nmea.rl"
-	{ utc.usec = current_digit; current_digit = 0;}
+tr49:
+#line 24 "nmea.rl"
+	{bcd = 10*((*p) - '0');}
 	goto st36;
 st36:
 	if ( ++p == pe )
 		goto _out36;
 case 36:
-#line 700 "../ext/nmea.cpp"
-	if ( (*p) == 44 )
-		goto st37;
+#line 713 "../ext/nmea.cpp"
 	if ( 48 <= (*p) && (*p) <= 57 )
 		goto tr50;
 	goto st0;
-tr110:
+tr50:
+#line 24 "nmea.rl"
+	{bcd += (*p) - '0';}
+#line 37 "nmea.rl"
+	{ utc.second = bcd;}
+	goto st37;
+st37:
+	if ( ++p == pe )
+		goto _out37;
+case 37:
+#line 727 "../ext/nmea.cpp"
+	switch( (*p) ) {
+		case 44: goto st38;
+		case 46: goto st97;
+	}
+	goto st0;
+tr129:
+#line 37 "nmea.rl"
+	{ utc.usec = current_digit; current_digit = 0;}
+	goto st38;
+st38:
+	if ( ++p == pe )
+		goto _out38;
+case 38:
+#line 741 "../ext/nmea.cpp"
+	if ( (*p) == 44 )
+		goto st39;
+	if ( 48 <= (*p) && (*p) <= 57 )
+		goto tr54;
+	goto st0;
+tr126:
 #line 46 "nmea.rl"
 	{
 		latitude.nil = false;
@@ -711,8 +752,8 @@ tr110:
 		current_float = 0;
 		current_degrees = 0;
 	}
-	goto st37;
-tr111:
+	goto st39;
+tr127:
 #line 45 "nmea.rl"
 	{current_degrees *= -1;}
 #line 46 "nmea.rl"
@@ -723,25 +764,25 @@ tr111:
 		current_float = 0;
 		current_degrees = 0;
 	}
-	goto st37;
-st37:
+	goto st39;
+st39:
 	if ( ++p == pe )
-		goto _out37;
-case 37:
-#line 732 "../ext/nmea.cpp"
+		goto _out39;
+case 39:
+#line 773 "../ext/nmea.cpp"
 	if ( (*p) == 44 )
-		goto st38;
+		goto st40;
 	goto st0;
-st38:
+st40:
 	if ( ++p == pe )
-		goto _out38;
-case 38:
+		goto _out40;
+case 40:
 	if ( (*p) == 44 )
-		goto st39;
+		goto st41;
 	if ( 48 <= (*p) && (*p) <= 57 )
-		goto tr53;
+		goto tr57;
 	goto st0;
-tr103:
+tr117:
 #line 56 "nmea.rl"
 	{
 		longitude.nil = false;
@@ -750,8 +791,8 @@ tr103:
 		current_degrees = 0;
 		current_float = 0;
 	}
-	goto st39;
-tr104:
+	goto st41;
+tr118:
 #line 55 "nmea.rl"
 	{current_degrees *= -1;}
 #line 56 "nmea.rl"
@@ -762,31 +803,12 @@ tr104:
 		current_degrees = 0;
 		current_float = 0;
 	}
-	goto st39;
-st39:
-	if ( ++p == pe )
-		goto _out39;
-case 39:
-#line 771 "../ext/nmea.cpp"
-	if ( (*p) == 44 )
-		goto st40;
-	goto st0;
-st40:
-	if ( ++p == pe )
-		goto _out40;
-case 40:
-	if ( 48 <= (*p) && (*p) <= 56 )
-		goto tr55;
-	goto st0;
-tr55:
-#line 3 "nmea.rl"
-	{gps_quality = (GGA_FIX)((*p)-'0');}
 	goto st41;
 st41:
 	if ( ++p == pe )
 		goto _out41;
 case 41:
-#line 790 "../ext/nmea.cpp"
+#line 812 "../ext/nmea.cpp"
 	if ( (*p) == 44 )
 		goto st42;
 	goto st0;
@@ -794,69 +816,73 @@ st42:
 	if ( ++p == pe )
 		goto _out42;
 case 42:
-	if ( (*p) == 44 )
-		goto st43;
-	if ( 48 <= (*p) && (*p) <= 57 )
-		goto tr58;
+	if ( 48 <= (*p) && (*p) <= 56 )
+		goto tr59;
 	goto st0;
-tr96:
-#line 4 "nmea.rl"
-	{active_satellite_count = bcd; }
+tr59:
+#line 3 "nmea.rl"
+	{gps_quality = (GGA_FIX)((*p)-'0');}
 	goto st43;
 st43:
 	if ( ++p == pe )
 		goto _out43;
 case 43:
-#line 811 "../ext/nmea.cpp"
+#line 831 "../ext/nmea.cpp"
 	if ( (*p) == 44 )
 		goto st44;
-	if ( 48 <= (*p) && (*p) <= 57 )
-		goto tr60;
 	goto st0;
-tr94:
-#line 11 "nmea.rl"
-	{ gsa_hdop = current_float; current_float = 0;}
-	goto st44;
 st44:
 	if ( ++p == pe )
 		goto _out44;
 case 44:
-#line 825 "../ext/nmea.cpp"
 	if ( (*p) == 44 )
 		goto st45;
 	if ( 48 <= (*p) && (*p) <= 57 )
 		goto tr62;
 	goto st0;
+tr108:
+#line 4 "nmea.rl"
+	{active_satellite_count = bcd; }
+	goto st45;
 st45:
 	if ( ++p == pe )
 		goto _out45;
 case 45:
-	if ( (*p) > 90 ) {
-		if ( 97 <= (*p) && (*p) <= 122 )
-			goto st46;
-	} else if ( (*p) >= 65 )
-		goto st46;
+#line 852 "../ext/nmea.cpp"
+	switch( (*p) ) {
+		case 44: goto st46;
+		case 45: goto st76;
+	}
+	if ( 48 <= (*p) && (*p) <= 57 )
+		goto tr65;
 	goto st0;
+tr106:
+#line 28 "nmea.rl"
+	{current_float = current_float*sign; sign = 1;}
+#line 11 "nmea.rl"
+	{ gsa_hdop = current_float; current_float = 0;}
+	goto st46;
 st46:
 	if ( ++p == pe )
 		goto _out46;
 case 46:
-	if ( (*p) == 44 )
-		goto st47;
+#line 870 "../ext/nmea.cpp"
+	switch( (*p) ) {
+		case 44: goto st47;
+		case 45: goto st70;
+	}
+	if ( 48 <= (*p) && (*p) <= 57 )
+		goto tr68;
 	goto st0;
-tr91:
-#line 5 "nmea.rl"
-	{altitude = current_float; current_float = 0;}
-	goto st47;
 st47:
 	if ( ++p == pe )
 		goto _out47;
 case 47:
-#line 856 "../ext/nmea.cpp"
-	if ( (*p) == 44 )
+	if ( (*p) > 90 ) {
+		if ( 97 <= (*p) && (*p) <= 122 )
+			goto st48;
+	} else if ( (*p) >= 65 )
 		goto st48;
-	if ( 48 <= (*p) && (*p) <= 57 )
-		goto tr66;
 	goto st0;
 st48:
 	if ( ++p == pe )
@@ -865,119 +891,146 @@ case 48:
 	if ( (*p) == 44 )
 		goto st49;
 	goto st0;
-tr86:
-#line 6 "nmea.rl"
-	{geoidal_height = current_float; current_float = 0;}
+tr102:
+#line 5 "nmea.rl"
+	{altitude = current_float; current_float = 0;}
 	goto st49;
 st49:
 	if ( ++p == pe )
 		goto _out49;
 case 49:
-#line 877 "../ext/nmea.cpp"
-	if ( (*p) == 44 )
-		goto st50;
+#line 903 "../ext/nmea.cpp"
+	switch( (*p) ) {
+		case 44: goto st50;
+		case 45: goto st64;
+	}
 	if ( 48 <= (*p) && (*p) <= 57 )
-		goto tr69;
+		goto tr73;
 	goto st0;
-tr81:
-#line 7 "nmea.rl"
-	{dgps_data_age = current_float; current_float = 0;}
-	goto st50;
 st50:
 	if ( ++p == pe )
 		goto _out50;
 case 50:
-#line 891 "../ext/nmea.cpp"
-	if ( 48 <= (*p) && (*p) <= 57 )
-		goto tr70;
+	if ( (*p) == 44 )
+		goto st51;
 	goto st0;
-tr70:
-#line 24 "nmea.rl"
-	{bcd = 10*((*p) - '0');}
+tr96:
+#line 6 "nmea.rl"
+	{geoidal_height = current_float; current_float = 0;}
 	goto st51;
 st51:
 	if ( ++p == pe )
 		goto _out51;
 case 51:
-#line 903 "../ext/nmea.cpp"
+#line 926 "../ext/nmea.cpp"
+	switch( (*p) ) {
+		case 44: goto st52;
+		case 45: goto st60;
+	}
 	if ( 48 <= (*p) && (*p) <= 57 )
-		goto tr71;
+		goto tr77;
 	goto st0;
-tr71:
-#line 24 "nmea.rl"
-	{bcd += (*p) - '0';}
+tr90:
+#line 28 "nmea.rl"
+	{current_float = current_float*sign; sign = 1;}
+#line 7 "nmea.rl"
+	{dgps_data_age = current_float; current_float = 0; }
 	goto st52;
 st52:
 	if ( ++p == pe )
 		goto _out52;
 case 52:
-#line 915 "../ext/nmea.cpp"
+#line 944 "../ext/nmea.cpp"
 	if ( 48 <= (*p) && (*p) <= 57 )
-		goto tr72;
+		goto tr78;
 	goto st0;
-tr72:
-#line 25 "nmea.rl"
-	{bcd = bcd*10 + ((*p) - '0');}
+tr78:
+#line 24 "nmea.rl"
+	{bcd = 10*((*p) - '0');}
 	goto st53;
 st53:
 	if ( ++p == pe )
 		goto _out53;
 case 53:
-#line 927 "../ext/nmea.cpp"
+#line 956 "../ext/nmea.cpp"
 	if ( 48 <= (*p) && (*p) <= 57 )
-		goto tr73;
+		goto tr79;
 	goto st0;
-tr73:
-#line 26 "nmea.rl"
-	{bcd = bcd*10 + ((*p) - '0');}
-#line 7 "nmea.rl"
-	{dgps_station_id = bcd;}
+tr79:
+#line 24 "nmea.rl"
+	{bcd += (*p) - '0';}
 	goto st54;
 st54:
 	if ( ++p == pe )
 		goto _out54;
 case 54:
-#line 941 "../ext/nmea.cpp"
-	if ( (*p) == 42 )
-		goto tr74;
+#line 968 "../ext/nmea.cpp"
+	if ( 48 <= (*p) && (*p) <= 57 )
+		goto tr80;
 	goto st0;
-tr74:
-#line 82 "nmea.rl"
-	{sentence_end = p; }
+tr80:
+#line 25 "nmea.rl"
+	{bcd = bcd*10 + ((*p) - '0');}
 	goto st55;
 st55:
 	if ( ++p == pe )
 		goto _out55;
 case 55:
-#line 953 "../ext/nmea.cpp"
-	if ( (*p) < 65 ) {
-		if ( 48 <= (*p) && (*p) <= 57 )
-			goto tr75;
-	} else if ( (*p) > 90 ) {
-		if ( 97 <= (*p) && (*p) <= 122 )
-			goto tr75;
-	} else
-		goto tr75;
+#line 980 "../ext/nmea.cpp"
+	if ( 48 <= (*p) && (*p) <= 57 )
+		goto tr81;
 	goto st0;
-tr75:
-#line 82 "nmea.rl"
-	{checksum[0] = (*p);}
+tr81:
+#line 26 "nmea.rl"
+	{bcd = bcd*10 + ((*p) - '0');}
+#line 7 "nmea.rl"
+	{dgps_station_id = bcd;}
 	goto st56;
 st56:
 	if ( ++p == pe )
 		goto _out56;
 case 56:
-#line 971 "../ext/nmea.cpp"
+#line 994 "../ext/nmea.cpp"
+	if ( (*p) == 42 )
+		goto tr82;
+	goto st0;
+tr82:
+#line 82 "nmea.rl"
+	{sentence_end = p; }
+	goto st57;
+st57:
+	if ( ++p == pe )
+		goto _out57;
+case 57:
+#line 1006 "../ext/nmea.cpp"
 	if ( (*p) < 65 ) {
 		if ( 48 <= (*p) && (*p) <= 57 )
-			goto tr76;
+			goto tr83;
 	} else if ( (*p) > 90 ) {
 		if ( 97 <= (*p) && (*p) <= 122 )
-			goto tr76;
+			goto tr83;
 	} else
-		goto tr76;
+		goto tr83;
 	goto st0;
-tr76:
+tr83:
+#line 82 "nmea.rl"
+	{checksum[0] = (*p);}
+	goto st58;
+st58:
+	if ( ++p == pe )
+		goto _out58;
+case 58:
+#line 1024 "../ext/nmea.cpp"
+	if ( (*p) < 65 ) {
+		if ( 48 <= (*p) && (*p) <= 57 )
+			goto tr84;
+	} else if ( (*p) > 90 ) {
+		if ( 97 <= (*p) && (*p) <= 122 )
+			goto tr84;
+	} else
+		goto tr84;
+	goto st0;
+tr84:
 #line 68 "nmea.rl"
 	{
 		checksum[1] = (*p);
@@ -993,68 +1046,34 @@ tr76:
 			throw DataError(buf);
 		}
 	}
-	goto st57;
-st57:
-	if ( ++p == pe )
-		goto _out57;
-case 57:
-#line 1002 "../ext/nmea.cpp"
-	switch( (*p) ) {
-		case 10: goto tr77;
-		case 13: goto tr78;
-	}
-	goto st0;
-tr69:
-#line 11 "nmea.rl"
-	{
-		current_float = 0;
-		current_digit = current_digit*10 + ((*p) - '0');
-	}
-	goto st58;
-st58:
-	if ( ++p == pe )
-		goto _out58;
-case 58:
-#line 1019 "../ext/nmea.cpp"
-	if ( (*p) == 46 )
-		goto tr79;
-	if ( 48 <= (*p) && (*p) <= 57 )
-		goto tr69;
-	goto st0;
-tr79:
-#line 15 "nmea.rl"
-	{
-		current_frac = 10;
-		current_float = current_digit;
-		current_digit = 0;
-	}
 	goto st59;
 st59:
 	if ( ++p == pe )
 		goto _out59;
 case 59:
-#line 1037 "../ext/nmea.cpp"
-	if ( 48 <= (*p) && (*p) <= 57 )
-		goto tr80;
-	goto st0;
-tr80:
-#line 20 "nmea.rl"
-	{
-		current_float += ((*p) - '0')*1.0 / current_frac;
-		current_frac *= 10;
+#line 1055 "../ext/nmea.cpp"
+	switch( (*p) ) {
+		case 10: goto tr85;
+		case 13: goto tr86;
 	}
-	goto st60;
+	goto st0;
 st60:
 	if ( ++p == pe )
 		goto _out60;
 case 60:
-#line 1052 "../ext/nmea.cpp"
-	if ( (*p) == 44 )
-		goto tr81;
 	if ( 48 <= (*p) && (*p) <= 57 )
-		goto tr80;
+		goto tr87;
 	goto st0;
-tr66:
+tr77:
+#line 11 "nmea.rl"
+	{
+		current_float = 0;
+		current_digit = current_digit*10 + ((*p) - '0');
+	}
+	goto st61;
+tr87:
+#line 28 "nmea.rl"
+	{sign = -1;}
 #line 11 "nmea.rl"
 	{
 		current_float = 0;
@@ -1065,13 +1084,13 @@ st61:
 	if ( ++p == pe )
 		goto _out61;
 case 61:
-#line 1069 "../ext/nmea.cpp"
+#line 1088 "../ext/nmea.cpp"
 	if ( (*p) == 46 )
-		goto tr82;
+		goto tr88;
 	if ( 48 <= (*p) && (*p) <= 57 )
-		goto tr66;
+		goto tr77;
 	goto st0;
-tr82:
+tr88:
 #line 15 "nmea.rl"
 	{
 		current_frac = 10;
@@ -1083,11 +1102,11 @@ st62:
 	if ( ++p == pe )
 		goto _out62;
 case 62:
-#line 1087 "../ext/nmea.cpp"
+#line 1106 "../ext/nmea.cpp"
 	if ( 48 <= (*p) && (*p) <= 57 )
-		goto tr83;
+		goto tr89;
 	goto st0;
-tr83:
+tr89:
 #line 20 "nmea.rl"
 	{
 		current_float += ((*p) - '0')*1.0 / current_frac;
@@ -1098,107 +1117,122 @@ st63:
 	if ( ++p == pe )
 		goto _out63;
 case 63:
-#line 1102 "../ext/nmea.cpp"
+#line 1121 "../ext/nmea.cpp"
 	if ( (*p) == 44 )
-		goto st64;
+		goto tr90;
 	if ( 48 <= (*p) && (*p) <= 57 )
-		goto tr83;
+		goto tr89;
 	goto st0;
 st64:
 	if ( ++p == pe )
 		goto _out64;
 case 64:
-	if ( (*p) > 90 ) {
-		if ( 97 <= (*p) && (*p) <= 122 )
-			goto tr85;
-	} else if ( (*p) >= 65 )
-		goto tr85;
+	if ( 48 <= (*p) && (*p) <= 57 )
+		goto tr91;
 	goto st0;
-tr85:
-#line 6 "nmea.rl"
-	{geoidal_height_units = (*p);}
-	goto st65;
-st65:
-	if ( ++p == pe )
-		goto _out65;
-case 65:
-#line 1126 "../ext/nmea.cpp"
-	if ( (*p) == 44 )
-		goto tr86;
-	goto st0;
-tr62:
+tr73:
 #line 11 "nmea.rl"
 	{
 		current_float = 0;
 		current_digit = current_digit*10 + ((*p) - '0');
 	}
-	goto st66;
-st66:
+	goto st65;
+tr91:
+#line 28 "nmea.rl"
+	{sign = -1;}
+#line 11 "nmea.rl"
+	{
+		current_float = 0;
+		current_digit = current_digit*10 + ((*p) - '0');
+	}
+	goto st65;
+st65:
 	if ( ++p == pe )
-		goto _out66;
-case 66:
-#line 1141 "../ext/nmea.cpp"
+		goto _out65;
+case 65:
+#line 1154 "../ext/nmea.cpp"
 	if ( (*p) == 46 )
-		goto tr87;
+		goto tr92;
 	if ( 48 <= (*p) && (*p) <= 57 )
-		goto tr62;
+		goto tr73;
 	goto st0;
-tr87:
+tr92:
 #line 15 "nmea.rl"
 	{
 		current_frac = 10;
 		current_float = current_digit;
 		current_digit = 0;
 	}
-	goto st67;
-st67:
+	goto st66;
+st66:
 	if ( ++p == pe )
-		goto _out67;
-case 67:
-#line 1159 "../ext/nmea.cpp"
+		goto _out66;
+case 66:
+#line 1172 "../ext/nmea.cpp"
 	if ( 48 <= (*p) && (*p) <= 57 )
-		goto tr88;
+		goto tr93;
 	goto st0;
-tr88:
+tr93:
 #line 20 "nmea.rl"
 	{
 		current_float += ((*p) - '0')*1.0 / current_frac;
 		current_frac *= 10;
 	}
+	goto st67;
+st67:
+	if ( ++p == pe )
+		goto _out67;
+case 67:
+#line 1187 "../ext/nmea.cpp"
+	if ( (*p) == 44 )
+		goto tr94;
+	if ( 48 <= (*p) && (*p) <= 57 )
+		goto tr93;
+	goto st0;
+tr94:
+#line 28 "nmea.rl"
+	{current_float = current_float*sign; sign = 1;}
 	goto st68;
 st68:
 	if ( ++p == pe )
 		goto _out68;
 case 68:
-#line 1174 "../ext/nmea.cpp"
-	if ( (*p) == 44 )
-		goto st69;
-	if ( 48 <= (*p) && (*p) <= 57 )
-		goto tr88;
+#line 1201 "../ext/nmea.cpp"
+	if ( (*p) > 90 ) {
+		if ( 97 <= (*p) && (*p) <= 122 )
+			goto tr95;
+	} else if ( (*p) >= 65 )
+		goto tr95;
 	goto st0;
+tr95:
+#line 6 "nmea.rl"
+	{geoidal_height_units = (*p);}
+	goto st69;
 st69:
 	if ( ++p == pe )
 		goto _out69;
 case 69:
-	if ( (*p) > 90 ) {
-		if ( 97 <= (*p) && (*p) <= 122 )
-			goto tr90;
-	} else if ( (*p) >= 65 )
-		goto tr90;
+#line 1216 "../ext/nmea.cpp"
+	if ( (*p) == 44 )
+		goto tr96;
 	goto st0;
-tr90:
-#line 5 "nmea.rl"
-	{altitude_units = (*p);}
-	goto st70;
 st70:
 	if ( ++p == pe )
 		goto _out70;
 case 70:
-#line 1198 "../ext/nmea.cpp"
-	if ( (*p) == 44 )
-		goto tr91;
+	if ( 48 <= (*p) && (*p) <= 57 )
+		goto tr97;
 	goto st0;
-tr60:
+tr68:
+#line 11 "nmea.rl"
+	{
+		current_float = 0;
+		current_digit = current_digit*10 + ((*p) - '0');
+	}
+	goto st71;
+tr97:
+#line 28 "nmea.rl"
+	{sign = -1;}
 #line 11 "nmea.rl"
 	{
 		current_float = 0;
@@ -1209,13 +1243,13 @@ st71:
 	if ( ++p == pe )
 		goto _out71;
 case 71:
-#line 1213 "../ext/nmea.cpp"
+#line 1247 "../ext/nmea.cpp"
 	if ( (*p) == 46 )
-		goto tr92;
+		goto tr98;
 	if ( 48 <= (*p) && (*p) <= 57 )
-		goto tr60;
+		goto tr68;
 	goto st0;
-tr92:
+tr98:
 #line 15 "nmea.rl"
 	{
 		current_frac = 10;
@@ -1227,11 +1261,11 @@ st72:
 	if ( ++p == pe )
 		goto _out72;
 case 72:
-#line 1231 "../ext/nmea.cpp"
+#line 1265 "../ext/nmea.cpp"
 	if ( 48 <= (*p) && (*p) <= 57 )
-		goto tr93;
+		goto tr99;
 	goto st0;
-tr93:
+tr99:
 #line 20 "nmea.rl"
 	{
 		current_float += ((*p) - '0')*1.0 / current_frac;
@@ -1242,151 +1276,156 @@ st73:
 	if ( ++p == pe )
 		goto _out73;
 case 73:
-#line 1246 "../ext/nmea.cpp"
+#line 1280 "../ext/nmea.cpp"
 	if ( (*p) == 44 )
-		goto tr94;
-	if ( 48 <= (*p) && (*p) <= 57 )
-		goto tr93;
-	goto st0;
-tr58:
-#line 24 "nmea.rl"
-	{bcd = 10*((*p) - '0');}
-	goto st74;
-st74:
-	if ( ++p == pe )
-		goto _out74;
-case 74:
-#line 1260 "../ext/nmea.cpp"
-	if ( 48 <= (*p) && (*p) <= 57 )
-		goto tr95;
-	goto st0;
-tr95:
-#line 24 "nmea.rl"
-	{bcd += (*p) - '0';}
-	goto st75;
-st75:
-	if ( ++p == pe )
-		goto _out75;
-case 75:
-#line 1272 "../ext/nmea.cpp"
-	if ( (*p) == 44 )
-		goto tr96;
-	goto st0;
-tr53:
-#line 24 "nmea.rl"
-	{bcd = 10*((*p) - '0');}
-	goto st76;
-st76:
-	if ( ++p == pe )
-		goto _out76;
-case 76:
-#line 1284 "../ext/nmea.cpp"
-	if ( 48 <= (*p) && (*p) <= 57 )
-		goto tr97;
-	goto st0;
-tr97:
-#line 24 "nmea.rl"
-	{bcd += (*p) - '0';}
-	goto st77;
-st77:
-	if ( ++p == pe )
-		goto _out77;
-case 77:
-#line 1296 "../ext/nmea.cpp"
-	if ( 48 <= (*p) && (*p) <= 57 )
-		goto tr98;
-	goto st0;
-tr98:
-#line 25 "nmea.rl"
-	{bcd = bcd*10 + ((*p) - '0');}
-#line 40 "nmea.rl"
-	{
-		current_degrees = bcd;
-		bcd = 0;
-	}
-	goto st78;
-st78:
-	if ( ++p == pe )
-		goto _out78;
-case 78:
-#line 1313 "../ext/nmea.cpp"
-	if ( 48 <= (*p) && (*p) <= 57 )
-		goto tr99;
-	goto st0;
-tr99:
-#line 11 "nmea.rl"
-	{
-		current_float = 0;
-		current_digit = current_digit*10 + ((*p) - '0');
-	}
-	goto st79;
-st79:
-	if ( ++p == pe )
-		goto _out79;
-case 79:
-#line 1328 "../ext/nmea.cpp"
-	if ( (*p) == 46 )
 		goto tr100;
 	if ( 48 <= (*p) && (*p) <= 57 )
 		goto tr99;
 	goto st0;
 tr100:
+#line 28 "nmea.rl"
+	{current_float = current_float*sign; sign = 1;}
+	goto st74;
+st74:
+	if ( ++p == pe )
+		goto _out74;
+case 74:
+#line 1294 "../ext/nmea.cpp"
+	if ( (*p) > 90 ) {
+		if ( 97 <= (*p) && (*p) <= 122 )
+			goto tr101;
+	} else if ( (*p) >= 65 )
+		goto tr101;
+	goto st0;
+tr101:
+#line 5 "nmea.rl"
+	{altitude_units = (*p);}
+	goto st75;
+st75:
+	if ( ++p == pe )
+		goto _out75;
+case 75:
+#line 1309 "../ext/nmea.cpp"
+	if ( (*p) == 44 )
+		goto tr102;
+	goto st0;
+st76:
+	if ( ++p == pe )
+		goto _out76;
+case 76:
+	if ( 48 <= (*p) && (*p) <= 57 )
+		goto tr103;
+	goto st0;
+tr65:
+#line 11 "nmea.rl"
+	{
+		current_float = 0;
+		current_digit = current_digit*10 + ((*p) - '0');
+	}
+	goto st77;
+tr103:
+#line 28 "nmea.rl"
+	{sign = -1;}
+#line 11 "nmea.rl"
+	{
+		current_float = 0;
+		current_digit = current_digit*10 + ((*p) - '0');
+	}
+	goto st77;
+st77:
+	if ( ++p == pe )
+		goto _out77;
+case 77:
+#line 1340 "../ext/nmea.cpp"
+	if ( (*p) == 46 )
+		goto tr104;
+	if ( 48 <= (*p) && (*p) <= 57 )
+		goto tr65;
+	goto st0;
+tr104:
 #line 15 "nmea.rl"
 	{
 		current_frac = 10;
 		current_float = current_digit;
 		current_digit = 0;
 	}
-	goto st80;
-st80:
+	goto st78;
+st78:
 	if ( ++p == pe )
-		goto _out80;
-case 80:
-#line 1346 "../ext/nmea.cpp"
+		goto _out78;
+case 78:
+#line 1358 "../ext/nmea.cpp"
 	if ( 48 <= (*p) && (*p) <= 57 )
-		goto tr101;
+		goto tr105;
 	goto st0;
-tr101:
+tr105:
 #line 20 "nmea.rl"
 	{
 		current_float += ((*p) - '0')*1.0 / current_frac;
 		current_frac *= 10;
 	}
+	goto st79;
+st79:
+	if ( ++p == pe )
+		goto _out79;
+case 79:
+#line 1373 "../ext/nmea.cpp"
+	if ( (*p) == 44 )
+		goto tr106;
+	if ( 48 <= (*p) && (*p) <= 57 )
+		goto tr105;
+	goto st0;
+tr62:
+#line 24 "nmea.rl"
+	{bcd = 10*((*p) - '0');}
+	goto st80;
+st80:
+	if ( ++p == pe )
+		goto _out80;
+case 80:
+#line 1387 "../ext/nmea.cpp"
+	if ( 48 <= (*p) && (*p) <= 57 )
+		goto tr107;
+	goto st0;
+tr107:
+#line 24 "nmea.rl"
+	{bcd += (*p) - '0';}
 	goto st81;
 st81:
 	if ( ++p == pe )
 		goto _out81;
 case 81:
-#line 1361 "../ext/nmea.cpp"
+#line 1399 "../ext/nmea.cpp"
 	if ( (*p) == 44 )
-		goto st82;
-	if ( 48 <= (*p) && (*p) <= 57 )
-		goto tr101;
+		goto tr108;
 	goto st0;
+tr57:
+#line 24 "nmea.rl"
+	{bcd = 10*((*p) - '0');}
+	goto st82;
 st82:
 	if ( ++p == pe )
 		goto _out82;
 case 82:
-	switch( (*p) ) {
-		case 69: goto tr103;
-		case 87: goto tr104;
-	}
+#line 1411 "../ext/nmea.cpp"
+	if ( 48 <= (*p) && (*p) <= 57 )
+		goto tr109;
 	goto st0;
-tr50:
+tr109:
 #line 24 "nmea.rl"
-	{bcd = 10*((*p) - '0');}
+	{bcd += (*p) - '0';}
 	goto st83;
 st83:
 	if ( ++p == pe )
 		goto _out83;
 case 83:
-#line 1384 "../ext/nmea.cpp"
+#line 1423 "../ext/nmea.cpp"
 	if ( 48 <= (*p) && (*p) <= 57 )
-		goto tr105;
+		goto tr110;
 	goto st0;
-tr105:
-#line 24 "nmea.rl"
-	{bcd += (*p) - '0';}
+tr110:
+#line 25 "nmea.rl"
+	{bcd = bcd*10 + ((*p) - '0');}
 #line 40 "nmea.rl"
 	{
 		current_degrees = bcd;
@@ -1397,75 +1436,18 @@ st84:
 	if ( ++p == pe )
 		goto _out84;
 case 84:
-#line 1401 "../ext/nmea.cpp"
+#line 1440 "../ext/nmea.cpp"
+	if ( (*p) == 45 )
+		goto st85;
 	if ( 48 <= (*p) && (*p) <= 57 )
-		goto tr106;
+		goto tr112;
 	goto st0;
-tr106:
-#line 11 "nmea.rl"
-	{
-		current_float = 0;
-		current_digit = current_digit*10 + ((*p) - '0');
-	}
-	goto st85;
 st85:
 	if ( ++p == pe )
 		goto _out85;
 case 85:
-#line 1416 "../ext/nmea.cpp"
-	if ( (*p) == 46 )
-		goto tr107;
 	if ( 48 <= (*p) && (*p) <= 57 )
-		goto tr106;
-	goto st0;
-tr107:
-#line 15 "nmea.rl"
-	{
-		current_frac = 10;
-		current_float = current_digit;
-		current_digit = 0;
-	}
-	goto st86;
-st86:
-	if ( ++p == pe )
-		goto _out86;
-case 86:
-#line 1434 "../ext/nmea.cpp"
-	if ( 48 <= (*p) && (*p) <= 57 )
-		goto tr108;
-	goto st0;
-tr108:
-#line 20 "nmea.rl"
-	{
-		current_float += ((*p) - '0')*1.0 / current_frac;
-		current_frac *= 10;
-	}
-	goto st87;
-st87:
-	if ( ++p == pe )
-		goto _out87;
-case 87:
-#line 1449 "../ext/nmea.cpp"
-	if ( (*p) == 44 )
-		goto st88;
-	if ( 48 <= (*p) && (*p) <= 57 )
-		goto tr108;
-	goto st0;
-st88:
-	if ( ++p == pe )
-		goto _out88;
-case 88:
-	switch( (*p) ) {
-		case 78: goto tr110;
-		case 83: goto tr111;
-	}
-	goto st0;
-st89:
-	if ( ++p == pe )
-		goto _out89;
-case 89:
-	if ( 48 <= (*p) && (*p) <= 57 )
-		goto tr112;
+		goto tr113;
 	goto st0;
 tr112:
 #line 11 "nmea.rl"
@@ -1473,41 +1455,232 @@ tr112:
 		current_float = 0;
 		current_digit = current_digit*10 + ((*p) - '0');
 	}
+	goto st86;
+tr113:
+#line 28 "nmea.rl"
+	{sign = -1;}
+#line 11 "nmea.rl"
+	{
+		current_float = 0;
+		current_digit = current_digit*10 + ((*p) - '0');
+	}
+	goto st86;
+st86:
+	if ( ++p == pe )
+		goto _out86;
+case 86:
+#line 1473 "../ext/nmea.cpp"
+	if ( (*p) == 46 )
+		goto tr114;
+	if ( 48 <= (*p) && (*p) <= 57 )
+		goto tr112;
+	goto st0;
+tr114:
+#line 15 "nmea.rl"
+	{
+		current_frac = 10;
+		current_float = current_digit;
+		current_digit = 0;
+	}
+	goto st87;
+st87:
+	if ( ++p == pe )
+		goto _out87;
+case 87:
+#line 1491 "../ext/nmea.cpp"
+	if ( 48 <= (*p) && (*p) <= 57 )
+		goto tr115;
+	goto st0;
+tr115:
+#line 20 "nmea.rl"
+	{
+		current_float += ((*p) - '0')*1.0 / current_frac;
+		current_frac *= 10;
+	}
+	goto st88;
+st88:
+	if ( ++p == pe )
+		goto _out88;
+case 88:
+#line 1506 "../ext/nmea.cpp"
+	if ( (*p) == 44 )
+		goto tr116;
+	if ( 48 <= (*p) && (*p) <= 57 )
+		goto tr115;
+	goto st0;
+tr116:
+#line 28 "nmea.rl"
+	{current_float = current_float*sign; sign = 1;}
+	goto st89;
+st89:
+	if ( ++p == pe )
+		goto _out89;
+case 89:
+#line 1520 "../ext/nmea.cpp"
+	switch( (*p) ) {
+		case 69: goto tr117;
+		case 87: goto tr118;
+	}
+	goto st0;
+tr54:
+#line 24 "nmea.rl"
+	{bcd = 10*((*p) - '0');}
 	goto st90;
 st90:
 	if ( ++p == pe )
 		goto _out90;
 case 90:
-#line 1482 "../ext/nmea.cpp"
-	if ( (*p) == 44 )
-		goto tr113;
+#line 1534 "../ext/nmea.cpp"
 	if ( 48 <= (*p) && (*p) <= 57 )
-		goto tr112;
+		goto tr119;
 	goto st0;
+tr119:
+#line 24 "nmea.rl"
+	{bcd += (*p) - '0';}
+#line 40 "nmea.rl"
+	{
+		current_degrees = bcd;
+		bcd = 0;
+	}
+	goto st91;
 st91:
 	if ( ++p == pe )
 		goto _out91;
 case 91:
-	if ( (*p) == 76 )
+#line 1551 "../ext/nmea.cpp"
+	if ( (*p) == 45 )
 		goto st92;
+	if ( 48 <= (*p) && (*p) <= 57 )
+		goto tr121;
 	goto st0;
 st92:
 	if ( ++p == pe )
 		goto _out92;
 case 92:
-	if ( (*p) == 44 )
-		goto st93;
+	if ( 48 <= (*p) && (*p) <= 57 )
+		goto tr122;
 	goto st0;
+tr121:
+#line 11 "nmea.rl"
+	{
+		current_float = 0;
+		current_digit = current_digit*10 + ((*p) - '0');
+	}
+	goto st93;
+tr122:
+#line 28 "nmea.rl"
+	{sign = -1;}
+#line 11 "nmea.rl"
+	{
+		current_float = 0;
+		current_digit = current_digit*10 + ((*p) - '0');
+	}
+	goto st93;
 st93:
 	if ( ++p == pe )
 		goto _out93;
 case 93:
-	if ( (*p) == 44 )
-		goto st94;
+#line 1584 "../ext/nmea.cpp"
+	if ( (*p) == 46 )
+		goto tr123;
 	if ( 48 <= (*p) && (*p) <= 57 )
-		goto tr117;
+		goto tr121;
 	goto st0;
-tr151:
+tr123:
+#line 15 "nmea.rl"
+	{
+		current_frac = 10;
+		current_float = current_digit;
+		current_digit = 0;
+	}
+	goto st94;
+st94:
+	if ( ++p == pe )
+		goto _out94;
+case 94:
+#line 1602 "../ext/nmea.cpp"
+	if ( 48 <= (*p) && (*p) <= 57 )
+		goto tr124;
+	goto st0;
+tr124:
+#line 20 "nmea.rl"
+	{
+		current_float += ((*p) - '0')*1.0 / current_frac;
+		current_frac *= 10;
+	}
+	goto st95;
+st95:
+	if ( ++p == pe )
+		goto _out95;
+case 95:
+#line 1617 "../ext/nmea.cpp"
+	if ( (*p) == 44 )
+		goto tr125;
+	if ( 48 <= (*p) && (*p) <= 57 )
+		goto tr124;
+	goto st0;
+tr125:
+#line 28 "nmea.rl"
+	{current_float = current_float*sign; sign = 1;}
+	goto st96;
+st96:
+	if ( ++p == pe )
+		goto _out96;
+case 96:
+#line 1631 "../ext/nmea.cpp"
+	switch( (*p) ) {
+		case 78: goto tr126;
+		case 83: goto tr127;
+	}
+	goto st0;
+st97:
+	if ( ++p == pe )
+		goto _out97;
+case 97:
+	if ( 48 <= (*p) && (*p) <= 57 )
+		goto tr128;
+	goto st0;
+tr128:
+#line 11 "nmea.rl"
+	{
+		current_float = 0;
+		current_digit = current_digit*10 + ((*p) - '0');
+	}
+	goto st98;
+st98:
+	if ( ++p == pe )
+		goto _out98;
+case 98:
+#line 1655 "../ext/nmea.cpp"
+	if ( (*p) == 44 )
+		goto tr129;
+	if ( 48 <= (*p) && (*p) <= 57 )
+		goto tr128;
+	goto st0;
+st99:
+	if ( ++p == pe )
+		goto _out99;
+case 99:
+	if ( (*p) == 76 )
+		goto st100;
+	goto st0;
+st100:
+	if ( ++p == pe )
+		goto _out100;
+case 100:
+	if ( (*p) == 44 )
+		goto st101;
+	goto st0;
+st101:
+	if ( ++p == pe )
+		goto _out101;
+case 101:
+	if ( (*p) == 44 )
+		goto st102;
+	if ( 48 <= (*p) && (*p) <= 57 )
+		goto tr133;
+	goto st0;
+tr171:
 #line 46 "nmea.rl"
 	{
 		latitude.nil = false;
@@ -1516,8 +1689,8 @@ tr151:
 		current_float = 0;
 		current_degrees = 0;
 	}
-	goto st94;
-tr152:
+	goto st102;
+tr172:
 #line 45 "nmea.rl"
 	{current_degrees *= -1;}
 #line 46 "nmea.rl"
@@ -1528,25 +1701,25 @@ tr152:
 		current_float = 0;
 		current_degrees = 0;
 	}
-	goto st94;
-st94:
+	goto st102;
+st102:
 	if ( ++p == pe )
-		goto _out94;
-case 94:
-#line 1537 "../ext/nmea.cpp"
+		goto _out102;
+case 102:
+#line 1710 "../ext/nmea.cpp"
 	if ( (*p) == 44 )
-		goto st95;
+		goto st103;
 	goto st0;
-st95:
+st103:
 	if ( ++p == pe )
-		goto _out95;
-case 95:
+		goto _out103;
+case 103:
 	if ( (*p) == 44 )
-		goto st96;
+		goto st104;
 	if ( 48 <= (*p) && (*p) <= 57 )
-		goto tr120;
+		goto tr136;
 	goto st0;
-tr144:
+tr162:
 #line 56 "nmea.rl"
 	{
 		longitude.nil = false;
@@ -1555,8 +1728,8 @@ tr144:
 		current_degrees = 0;
 		current_float = 0;
 	}
-	goto st96;
-tr145:
+	goto st104;
+tr163:
 #line 55 "nmea.rl"
 	{current_degrees *= -1;}
 #line 56 "nmea.rl"
@@ -1567,160 +1740,160 @@ tr145:
 		current_degrees = 0;
 		current_float = 0;
 	}
-	goto st96;
-st96:
-	if ( ++p == pe )
-		goto _out96;
-case 96:
-#line 1576 "../ext/nmea.cpp"
-	if ( (*p) == 44 )
-		goto st97;
-	goto st0;
-st97:
-	if ( ++p == pe )
-		goto _out97;
-case 97:
-	if ( 48 <= (*p) && (*p) <= 57 )
-		goto tr122;
-	goto st0;
-tr122:
-#line 24 "nmea.rl"
-	{bcd = 10*((*p) - '0');}
-	goto st98;
-st98:
-	if ( ++p == pe )
-		goto _out98;
-case 98:
-#line 1595 "../ext/nmea.cpp"
-	if ( 48 <= (*p) && (*p) <= 57 )
-		goto tr123;
-	goto st0;
-tr123:
-#line 24 "nmea.rl"
-	{bcd += (*p) - '0';}
-#line 37 "nmea.rl"
-	{ utc.hour = bcd; }
-	goto st99;
-st99:
-	if ( ++p == pe )
-		goto _out99;
-case 99:
-#line 1609 "../ext/nmea.cpp"
-	if ( 48 <= (*p) && (*p) <= 57 )
-		goto tr124;
-	goto st0;
-tr124:
-#line 24 "nmea.rl"
-	{bcd = 10*((*p) - '0');}
-	goto st100;
-st100:
-	if ( ++p == pe )
-		goto _out100;
-case 100:
-#line 1621 "../ext/nmea.cpp"
-	if ( 48 <= (*p) && (*p) <= 57 )
-		goto tr125;
-	goto st0;
-tr125:
-#line 24 "nmea.rl"
-	{bcd += (*p) - '0';}
-#line 37 "nmea.rl"
-	{ utc.minute = bcd;}
-	goto st101;
-st101:
-	if ( ++p == pe )
-		goto _out101;
-case 101:
-#line 1635 "../ext/nmea.cpp"
-	if ( 48 <= (*p) && (*p) <= 57 )
-		goto tr126;
-	goto st0;
-tr126:
-#line 24 "nmea.rl"
-	{bcd = 10*((*p) - '0');}
-	goto st102;
-st102:
-	if ( ++p == pe )
-		goto _out102;
-case 102:
-#line 1647 "../ext/nmea.cpp"
-	if ( 48 <= (*p) && (*p) <= 57 )
-		goto tr127;
-	goto st0;
-tr127:
-#line 24 "nmea.rl"
-	{bcd += (*p) - '0';}
-#line 37 "nmea.rl"
-	{ utc.second = bcd;}
-	goto st103;
-st103:
-	if ( ++p == pe )
-		goto _out103;
-case 103:
-#line 1661 "../ext/nmea.cpp"
-	switch( (*p) ) {
-		case 44: goto st104;
-		case 46: goto st109;
-	}
-	goto st0;
-tr137:
-#line 37 "nmea.rl"
-	{ utc.usec = current_digit; current_digit = 0;}
 	goto st104;
 st104:
 	if ( ++p == pe )
 		goto _out104;
 case 104:
-#line 1675 "../ext/nmea.cpp"
-	switch( (*p) ) {
-		case 65: goto st105;
-		case 86: goto st105;
-	}
+#line 1749 "../ext/nmea.cpp"
+	if ( (*p) == 44 )
+		goto st105;
 	goto st0;
 st105:
 	if ( ++p == pe )
 		goto _out105;
 case 105:
-	if ( (*p) == 42 )
-		goto tr131;
+	if ( 48 <= (*p) && (*p) <= 57 )
+		goto tr138;
 	goto st0;
-tr131:
-#line 82 "nmea.rl"
-	{sentence_end = p; }
+tr138:
+#line 24 "nmea.rl"
+	{bcd = 10*((*p) - '0');}
 	goto st106;
 st106:
 	if ( ++p == pe )
 		goto _out106;
 case 106:
-#line 1696 "../ext/nmea.cpp"
-	if ( (*p) < 65 ) {
-		if ( 48 <= (*p) && (*p) <= 57 )
-			goto tr132;
-	} else if ( (*p) > 90 ) {
-		if ( 97 <= (*p) && (*p) <= 122 )
-			goto tr132;
-	} else
-		goto tr132;
+#line 1768 "../ext/nmea.cpp"
+	if ( 48 <= (*p) && (*p) <= 57 )
+		goto tr139;
 	goto st0;
-tr132:
-#line 82 "nmea.rl"
-	{checksum[0] = (*p);}
+tr139:
+#line 24 "nmea.rl"
+	{bcd += (*p) - '0';}
+#line 37 "nmea.rl"
+	{ utc.hour = bcd; }
 	goto st107;
 st107:
 	if ( ++p == pe )
 		goto _out107;
 case 107:
-#line 1714 "../ext/nmea.cpp"
+#line 1782 "../ext/nmea.cpp"
+	if ( 48 <= (*p) && (*p) <= 57 )
+		goto tr140;
+	goto st0;
+tr140:
+#line 24 "nmea.rl"
+	{bcd = 10*((*p) - '0');}
+	goto st108;
+st108:
+	if ( ++p == pe )
+		goto _out108;
+case 108:
+#line 1794 "../ext/nmea.cpp"
+	if ( 48 <= (*p) && (*p) <= 57 )
+		goto tr141;
+	goto st0;
+tr141:
+#line 24 "nmea.rl"
+	{bcd += (*p) - '0';}
+#line 37 "nmea.rl"
+	{ utc.minute = bcd;}
+	goto st109;
+st109:
+	if ( ++p == pe )
+		goto _out109;
+case 109:
+#line 1808 "../ext/nmea.cpp"
+	if ( 48 <= (*p) && (*p) <= 57 )
+		goto tr142;
+	goto st0;
+tr142:
+#line 24 "nmea.rl"
+	{bcd = 10*((*p) - '0');}
+	goto st110;
+st110:
+	if ( ++p == pe )
+		goto _out110;
+case 110:
+#line 1820 "../ext/nmea.cpp"
+	if ( 48 <= (*p) && (*p) <= 57 )
+		goto tr143;
+	goto st0;
+tr143:
+#line 24 "nmea.rl"
+	{bcd += (*p) - '0';}
+#line 37 "nmea.rl"
+	{ utc.second = bcd;}
+	goto st111;
+st111:
+	if ( ++p == pe )
+		goto _out111;
+case 111:
+#line 1834 "../ext/nmea.cpp"
+	switch( (*p) ) {
+		case 44: goto st112;
+		case 46: goto st117;
+	}
+	goto st0;
+tr153:
+#line 37 "nmea.rl"
+	{ utc.usec = current_digit; current_digit = 0;}
+	goto st112;
+st112:
+	if ( ++p == pe )
+		goto _out112;
+case 112:
+#line 1848 "../ext/nmea.cpp"
+	switch( (*p) ) {
+		case 65: goto st113;
+		case 86: goto st113;
+	}
+	goto st0;
+st113:
+	if ( ++p == pe )
+		goto _out113;
+case 113:
+	if ( (*p) == 42 )
+		goto tr147;
+	goto st0;
+tr147:
+#line 82 "nmea.rl"
+	{sentence_end = p; }
+	goto st114;
+st114:
+	if ( ++p == pe )
+		goto _out114;
+case 114:
+#line 1869 "../ext/nmea.cpp"
 	if ( (*p) < 65 ) {
 		if ( 48 <= (*p) && (*p) <= 57 )
-			goto tr133;
+			goto tr148;
 	} else if ( (*p) > 90 ) {
 		if ( 97 <= (*p) && (*p) <= 122 )
-			goto tr133;
+			goto tr148;
 	} else
-		goto tr133;
+		goto tr148;
 	goto st0;
-tr133:
+tr148:
+#line 82 "nmea.rl"
+	{checksum[0] = (*p);}
+	goto st115;
+st115:
+	if ( ++p == pe )
+		goto _out115;
+case 115:
+#line 1887 "../ext/nmea.cpp"
+	if ( (*p) < 65 ) {
+		if ( 48 <= (*p) && (*p) <= 57 )
+			goto tr149;
+	} else if ( (*p) > 90 ) {
+		if ( 97 <= (*p) && (*p) <= 122 )
+			goto tr149;
+	} else
+		goto tr149;
+	goto st0;
+tr149:
 #line 68 "nmea.rl"
 	{
 		checksum[1] = (*p);
@@ -1736,66 +1909,66 @@ tr133:
 			throw DataError(buf);
 		}
 	}
-	goto st108;
-st108:
+	goto st116;
+st116:
 	if ( ++p == pe )
-		goto _out108;
-case 108:
-#line 1745 "../ext/nmea.cpp"
+		goto _out116;
+case 116:
+#line 1918 "../ext/nmea.cpp"
 	switch( (*p) ) {
-		case 10: goto tr134;
-		case 13: goto tr135;
+		case 10: goto tr150;
+		case 13: goto tr151;
 	}
 	goto st0;
-st109:
+st117:
 	if ( ++p == pe )
-		goto _out109;
-case 109:
+		goto _out117;
+case 117:
 	if ( 48 <= (*p) && (*p) <= 57 )
-		goto tr136;
+		goto tr152;
 	goto st0;
-tr136:
+tr152:
 #line 11 "nmea.rl"
 	{
 		current_float = 0;
 		current_digit = current_digit*10 + ((*p) - '0');
 	}
-	goto st110;
-st110:
+	goto st118;
+st118:
 	if ( ++p == pe )
-		goto _out110;
-case 110:
-#line 1769 "../ext/nmea.cpp"
+		goto _out118;
+case 118:
+#line 1942 "../ext/nmea.cpp"
 	if ( (*p) == 44 )
-		goto tr137;
+		goto tr153;
 	if ( 48 <= (*p) && (*p) <= 57 )
-		goto tr136;
+		goto tr152;
 	goto st0;
-tr120:
+tr136:
 #line 24 "nmea.rl"
 	{bcd = 10*((*p) - '0');}
-	goto st111;
-st111:
+	goto st119;
+st119:
 	if ( ++p == pe )
-		goto _out111;
-case 111:
-#line 1783 "../ext/nmea.cpp"
+		goto _out119;
+case 119:
+#line 1956 "../ext/nmea.cpp"
 	if ( 48 <= (*p) && (*p) <= 57 )
-		goto tr138;
+		goto tr154;
 	goto st0;
-tr138:
+tr154:
 #line 24 "nmea.rl"
 	{bcd += (*p) - '0';}
-	goto st112;
-st112:
+	goto st120;
+st120:
 	if ( ++p == pe )
-		goto _out112;
-case 112:
-#line 1795 "../ext/nmea.cpp"
+		goto _out120;
+case 120:
+#line 1968 "../ext/nmea.cpp"
 	if ( 48 <= (*p) && (*p) <= 57 )
-		goto tr139;
+		goto tr155;
 	goto st0;
-tr139:
+tr155:
 #line 25 "nmea.rl"
 	{bcd = bcd*10 + ((*p) - '0');}
 #line 40 "nmea.rl"
@@ -1803,87 +1976,110 @@ tr139:
 		current_degrees = bcd;
 		bcd = 0;
 	}
-	goto st113;
-st113:
+	goto st121;
+st121:
 	if ( ++p == pe )
-		goto _out113;
-case 113:
-#line 1812 "../ext/nmea.cpp"
+		goto _out121;
+case 121:
+#line 1985 "../ext/nmea.cpp"
+	if ( (*p) == 45 )
+		goto st122;
 	if ( 48 <= (*p) && (*p) <= 57 )
-		goto tr140;
+		goto tr157;
 	goto st0;
-tr140:
+st122:
+	if ( ++p == pe )
+		goto _out122;
+case 122:
+	if ( 48 <= (*p) && (*p) <= 57 )
+		goto tr158;
+	goto st0;
+tr157:
 #line 11 "nmea.rl"
 	{
 		current_float = 0;
 		current_digit = current_digit*10 + ((*p) - '0');
 	}
-	goto st114;
-st114:
+	goto st123;
+tr158:
+#line 28 "nmea.rl"
+	{sign = -1;}
+#line 11 "nmea.rl"
+	{
+		current_float = 0;
+		current_digit = current_digit*10 + ((*p) - '0');
+	}
+	goto st123;
+st123:
 	if ( ++p == pe )
-		goto _out114;
-case 114:
-#line 1827 "../ext/nmea.cpp"
+		goto _out123;
+case 123:
+#line 2018 "../ext/nmea.cpp"
 	if ( (*p) == 46 )
-		goto tr141;
+		goto tr159;
 	if ( 48 <= (*p) && (*p) <= 57 )
-		goto tr140;
+		goto tr157;
 	goto st0;
-tr141:
+tr159:
 #line 15 "nmea.rl"
 	{
 		current_frac = 10;
 		current_float = current_digit;
 		current_digit = 0;
 	}
-	goto st115;
-st115:
+	goto st124;
+st124:
 	if ( ++p == pe )
-		goto _out115;
-case 115:
-#line 1845 "../ext/nmea.cpp"
+		goto _out124;
+case 124:
+#line 2036 "../ext/nmea.cpp"
 	if ( 48 <= (*p) && (*p) <= 57 )
-		goto tr142;
+		goto tr160;
 	goto st0;
-tr142:
+tr160:
 #line 20 "nmea.rl"
 	{
 		current_float += ((*p) - '0')*1.0 / current_frac;
 		current_frac *= 10;
 	}
-	goto st116;
-st116:
+	goto st125;
+st125:
 	if ( ++p == pe )
-		goto _out116;
-case 116:
-#line 1860 "../ext/nmea.cpp"
+		goto _out125;
+case 125:
+#line 2051 "../ext/nmea.cpp"
 	if ( (*p) == 44 )
-		goto st117;
+		goto tr161;
 	if ( 48 <= (*p) && (*p) <= 57 )
-		goto tr142;
+		goto tr160;
 	goto st0;
-st117:
+tr161:
+#line 28 "nmea.rl"
+	{current_float = current_float*sign; sign = 1;}
+	goto st126;
+st126:
 	if ( ++p == pe )
-		goto _out117;
-case 117:
+		goto _out126;
+case 126:
+#line 2065 "../ext/nmea.cpp"
 	switch( (*p) ) {
-		case 69: goto tr144;
-		case 87: goto tr145;
+		case 69: goto tr162;
+		case 87: goto tr163;
 	}
 	goto st0;
-tr117:
+tr133:
 #line 24 "nmea.rl"
 	{bcd = 10*((*p) - '0');}
-	goto st118;
-st118:
+	goto st127;
+st127:
 	if ( ++p == pe )
-		goto _out118;
-case 118:
-#line 1883 "../ext/nmea.cpp"
+		goto _out127;
+case 127:
+#line 2079 "../ext/nmea.cpp"
 	if ( 48 <= (*p) && (*p) <= 57 )
-		goto tr146;
+		goto tr164;
 	goto st0;
-tr146:
+tr164:
 #line 24 "nmea.rl"
 	{bcd += (*p) - '0';}
 #line 40 "nmea.rl"
@@ -1891,175 +2087,23 @@ tr146:
 		current_degrees = bcd;
 		bcd = 0;
 	}
-	goto st119;
-st119:
-	if ( ++p == pe )
-		goto _out119;
-case 119:
-#line 1900 "../ext/nmea.cpp"
-	if ( 48 <= (*p) && (*p) <= 57 )
-		goto tr147;
-	goto st0;
-tr147:
-#line 11 "nmea.rl"
-	{
-		current_float = 0;
-		current_digit = current_digit*10 + ((*p) - '0');
-	}
-	goto st120;
-st120:
-	if ( ++p == pe )
-		goto _out120;
-case 120:
-#line 1915 "../ext/nmea.cpp"
-	if ( (*p) == 46 )
-		goto tr148;
-	if ( 48 <= (*p) && (*p) <= 57 )
-		goto tr147;
-	goto st0;
-tr148:
-#line 15 "nmea.rl"
-	{
-		current_frac = 10;
-		current_float = current_digit;
-		current_digit = 0;
-	}
-	goto st121;
-st121:
-	if ( ++p == pe )
-		goto _out121;
-case 121:
-#line 1933 "../ext/nmea.cpp"
-	if ( 48 <= (*p) && (*p) <= 57 )
-		goto tr149;
-	goto st0;
-tr149:
-#line 20 "nmea.rl"
-	{
-		current_float += ((*p) - '0')*1.0 / current_frac;
-		current_frac *= 10;
-	}
-	goto st122;
-st122:
-	if ( ++p == pe )
-		goto _out122;
-case 122:
-#line 1948 "../ext/nmea.cpp"
-	if ( (*p) == 44 )
-		goto st123;
-	if ( 48 <= (*p) && (*p) <= 57 )
-		goto tr149;
-	goto st0;
-st123:
-	if ( ++p == pe )
-		goto _out123;
-case 123:
-	switch( (*p) ) {
-		case 78: goto tr151;
-		case 83: goto tr152;
-	}
-	goto st0;
-st124:
-	if ( ++p == pe )
-		goto _out124;
-case 124:
-	switch( (*p) ) {
-		case 65: goto st125;
-		case 86: goto st157;
-	}
-	goto st0;
-st125:
-	if ( ++p == pe )
-		goto _out125;
-case 125:
-	if ( (*p) == 44 )
-		goto st126;
-	goto st0;
-st126:
-	if ( ++p == pe )
-		goto _out126;
-case 126:
-	switch( (*p) ) {
-		case 65: goto tr156;
-		case 77: goto tr157;
-	}
-	goto st0;
-tr156:
-#line 3 "nmea.rl"
-	{gsa_automatic = true; }
-	goto st127;
-tr157:
-#line 3 "nmea.rl"
-	{gsa_automatic = false;}
-	goto st127;
-st127:
-	if ( ++p == pe )
-		goto _out127;
-case 127:
-#line 2000 "../ext/nmea.cpp"
-	if ( (*p) == 44 )
-		goto st128;
-	goto st0;
+	goto st128;
 st128:
 	if ( ++p == pe )
 		goto _out128;
 case 128:
-	if ( 49 <= (*p) && (*p) <= 51 )
-		goto tr159;
+#line 2096 "../ext/nmea.cpp"
+	if ( (*p) == 45 )
+		goto st129;
+	if ( 48 <= (*p) && (*p) <= 57 )
+		goto tr166;
 	goto st0;
-tr159:
-#line 4 "nmea.rl"
-	{gsa_mode = GSA_MODE((*p)-'0');}
-	goto st129;
 st129:
 	if ( ++p == pe )
 		goto _out129;
 case 129:
-#line 2019 "../ext/nmea.cpp"
-	if ( (*p) == 44 )
-		goto tr160;
-	goto st0;
-tr162:
-#line 11 "nmea.rl"
-	{
-		current_float = 0;
-		current_digit = current_digit*10 + ((*p) - '0');
-	}
-	goto st130;
-tr160:
-#line 4 "nmea.rl"
-	{gsa_prn_index = 0;}
-	goto st130;
-st130:
-	if ( ++p == pe )
-		goto _out130;
-case 130:
-#line 2038 "../ext/nmea.cpp"
-	if ( (*p) == 44 )
-		goto tr161;
 	if ( 48 <= (*p) && (*p) <= 57 )
-		goto tr162;
-	goto st0;
-tr164:
-#line 11 "nmea.rl"
-	{
-		current_float = 0;
-		current_digit = current_digit*10 + ((*p) - '0');
-	}
-	goto st131;
-tr161:
-#line 5 "nmea.rl"
-	{if(current_digit) {gsa_prns[gsa_prn_index] = current_digit;} gsa_prn_index++; current_digit = 0; }
-	goto st131;
-st131:
-	if ( ++p == pe )
-		goto _out131;
-case 131:
-#line 2059 "../ext/nmea.cpp"
-	if ( (*p) == 44 )
-		goto tr163;
-	if ( 48 <= (*p) && (*p) <= 57 )
-		goto tr164;
+		goto tr167;
 	goto st0;
 tr166:
 #line 11 "nmea.rl"
@@ -2067,166 +2111,131 @@ tr166:
 		current_float = 0;
 		current_digit = current_digit*10 + ((*p) - '0');
 	}
-	goto st132;
-tr163:
-#line 5 "nmea.rl"
-	{if(current_digit) {gsa_prns[gsa_prn_index] = current_digit;} gsa_prn_index++; current_digit = 0; }
+	goto st130;
+tr167:
+#line 28 "nmea.rl"
+	{sign = -1;}
+#line 11 "nmea.rl"
+	{
+		current_float = 0;
+		current_digit = current_digit*10 + ((*p) - '0');
+	}
+	goto st130;
+st130:
+	if ( ++p == pe )
+		goto _out130;
+case 130:
+#line 2129 "../ext/nmea.cpp"
+	if ( (*p) == 46 )
+		goto tr168;
+	if ( 48 <= (*p) && (*p) <= 57 )
+		goto tr166;
+	goto st0;
+tr168:
+#line 15 "nmea.rl"
+	{
+		current_frac = 10;
+		current_float = current_digit;
+		current_digit = 0;
+	}
+	goto st131;
+st131:
+	if ( ++p == pe )
+		goto _out131;
+case 131:
+#line 2147 "../ext/nmea.cpp"
+	if ( 48 <= (*p) && (*p) <= 57 )
+		goto tr169;
+	goto st0;
+tr169:
+#line 20 "nmea.rl"
+	{
+		current_float += ((*p) - '0')*1.0 / current_frac;
+		current_frac *= 10;
+	}
 	goto st132;
 st132:
 	if ( ++p == pe )
 		goto _out132;
 case 132:
-#line 2080 "../ext/nmea.cpp"
+#line 2162 "../ext/nmea.cpp"
 	if ( (*p) == 44 )
-		goto tr165;
+		goto tr170;
 	if ( 48 <= (*p) && (*p) <= 57 )
-		goto tr166;
+		goto tr169;
 	goto st0;
-tr168:
-#line 11 "nmea.rl"
-	{
-		current_float = 0;
-		current_digit = current_digit*10 + ((*p) - '0');
-	}
-	goto st133;
-tr165:
-#line 5 "nmea.rl"
-	{if(current_digit) {gsa_prns[gsa_prn_index] = current_digit;} gsa_prn_index++; current_digit = 0; }
+tr170:
+#line 28 "nmea.rl"
+	{current_float = current_float*sign; sign = 1;}
 	goto st133;
 st133:
 	if ( ++p == pe )
 		goto _out133;
 case 133:
-#line 2101 "../ext/nmea.cpp"
-	if ( (*p) == 44 )
-		goto tr167;
-	if ( 48 <= (*p) && (*p) <= 57 )
-		goto tr168;
-	goto st0;
-tr170:
-#line 11 "nmea.rl"
-	{
-		current_float = 0;
-		current_digit = current_digit*10 + ((*p) - '0');
+#line 2176 "../ext/nmea.cpp"
+	switch( (*p) ) {
+		case 78: goto tr171;
+		case 83: goto tr172;
 	}
-	goto st134;
-tr167:
-#line 5 "nmea.rl"
-	{if(current_digit) {gsa_prns[gsa_prn_index] = current_digit;} gsa_prn_index++; current_digit = 0; }
-	goto st134;
+	goto st0;
 st134:
 	if ( ++p == pe )
 		goto _out134;
 case 134:
-#line 2122 "../ext/nmea.cpp"
-	if ( (*p) == 44 )
-		goto tr169;
-	if ( 48 <= (*p) && (*p) <= 57 )
-		goto tr170;
-	goto st0;
-tr172:
-#line 11 "nmea.rl"
-	{
-		current_float = 0;
-		current_digit = current_digit*10 + ((*p) - '0');
+	switch( (*p) ) {
+		case 65: goto st135;
+		case 86: goto st170;
 	}
-	goto st135;
-tr169:
-#line 5 "nmea.rl"
-	{if(current_digit) {gsa_prns[gsa_prn_index] = current_digit;} gsa_prn_index++; current_digit = 0; }
-	goto st135;
+	goto st0;
 st135:
 	if ( ++p == pe )
 		goto _out135;
 case 135:
-#line 2143 "../ext/nmea.cpp"
 	if ( (*p) == 44 )
-		goto tr171;
-	if ( 48 <= (*p) && (*p) <= 57 )
-		goto tr172;
+		goto st136;
 	goto st0;
-tr174:
-#line 11 "nmea.rl"
-	{
-		current_float = 0;
-		current_digit = current_digit*10 + ((*p) - '0');
-	}
-	goto st136;
-tr171:
-#line 5 "nmea.rl"
-	{if(current_digit) {gsa_prns[gsa_prn_index] = current_digit;} gsa_prn_index++; current_digit = 0; }
-	goto st136;
 st136:
 	if ( ++p == pe )
 		goto _out136;
 case 136:
-#line 2164 "../ext/nmea.cpp"
-	if ( (*p) == 44 )
-		goto tr173;
-	if ( 48 <= (*p) && (*p) <= 57 )
-		goto tr174;
+	switch( (*p) ) {
+		case 65: goto tr176;
+		case 77: goto tr177;
+	}
 	goto st0;
 tr176:
-#line 11 "nmea.rl"
-	{
-		current_float = 0;
-		current_digit = current_digit*10 + ((*p) - '0');
-	}
+#line 3 "nmea.rl"
+	{gsa_automatic = true; }
 	goto st137;
-tr173:
-#line 5 "nmea.rl"
-	{if(current_digit) {gsa_prns[gsa_prn_index] = current_digit;} gsa_prn_index++; current_digit = 0; }
+tr177:
+#line 3 "nmea.rl"
+	{gsa_automatic = false;}
 	goto st137;
 st137:
 	if ( ++p == pe )
 		goto _out137;
 case 137:
-#line 2185 "../ext/nmea.cpp"
+#line 2219 "../ext/nmea.cpp"
 	if ( (*p) == 44 )
-		goto tr175;
-	if ( 48 <= (*p) && (*p) <= 57 )
-		goto tr176;
+		goto st138;
 	goto st0;
-tr178:
-#line 11 "nmea.rl"
-	{
-		current_float = 0;
-		current_digit = current_digit*10 + ((*p) - '0');
-	}
-	goto st138;
-tr175:
-#line 5 "nmea.rl"
-	{if(current_digit) {gsa_prns[gsa_prn_index] = current_digit;} gsa_prn_index++; current_digit = 0; }
-	goto st138;
 st138:
 	if ( ++p == pe )
 		goto _out138;
 case 138:
-#line 2206 "../ext/nmea.cpp"
-	if ( (*p) == 44 )
-		goto tr177;
-	if ( 48 <= (*p) && (*p) <= 57 )
-		goto tr178;
+	if ( 49 <= (*p) && (*p) <= 51 )
+		goto tr179;
 	goto st0;
-tr180:
-#line 11 "nmea.rl"
-	{
-		current_float = 0;
-		current_digit = current_digit*10 + ((*p) - '0');
-	}
-	goto st139;
-tr177:
-#line 5 "nmea.rl"
-	{if(current_digit) {gsa_prns[gsa_prn_index] = current_digit;} gsa_prn_index++; current_digit = 0; }
+tr179:
+#line 4 "nmea.rl"
+	{gsa_mode = GSA_MODE((*p)-'0');}
 	goto st139;
 st139:
 	if ( ++p == pe )
 		goto _out139;
 case 139:
-#line 2227 "../ext/nmea.cpp"
+#line 2238 "../ext/nmea.cpp"
 	if ( (*p) == 44 )
-		goto tr179;
-	if ( 48 <= (*p) && (*p) <= 57 )
 		goto tr180;
 	goto st0;
 tr182:
@@ -2236,15 +2245,15 @@ tr182:
 		current_digit = current_digit*10 + ((*p) - '0');
 	}
 	goto st140;
-tr179:
-#line 5 "nmea.rl"
-	{if(current_digit) {gsa_prns[gsa_prn_index] = current_digit;} gsa_prn_index++; current_digit = 0; }
+tr180:
+#line 4 "nmea.rl"
+	{gsa_prn_index = 0;}
 	goto st140;
 st140:
 	if ( ++p == pe )
 		goto _out140;
 case 140:
-#line 2248 "../ext/nmea.cpp"
+#line 2257 "../ext/nmea.cpp"
 	if ( (*p) == 44 )
 		goto tr181;
 	if ( 48 <= (*p) && (*p) <= 57 )
@@ -2265,12 +2274,19 @@ st141:
 	if ( ++p == pe )
 		goto _out141;
 case 141:
-#line 2269 "../ext/nmea.cpp"
+#line 2278 "../ext/nmea.cpp"
 	if ( (*p) == 44 )
 		goto tr183;
 	if ( 48 <= (*p) && (*p) <= 57 )
 		goto tr184;
 	goto st0;
+tr186:
+#line 11 "nmea.rl"
+	{
+		current_float = 0;
+		current_digit = current_digit*10 + ((*p) - '0');
+	}
+	goto st142;
 tr183:
 #line 5 "nmea.rl"
 	{if(current_digit) {gsa_prns[gsa_prn_index] = current_digit;} gsa_prn_index++; current_digit = 0; }
@@ -2279,77 +2295,296 @@ st142:
 	if ( ++p == pe )
 		goto _out142;
 case 142:
-#line 2283 "../ext/nmea.cpp"
+#line 2299 "../ext/nmea.cpp"
 	if ( (*p) == 44 )
-		goto st143;
+		goto tr185;
 	if ( 48 <= (*p) && (*p) <= 57 )
 		goto tr186;
 	goto st0;
-tr202:
-#line 10 "nmea.rl"
-	{ gsa_pdop = current_float; current_float = 0;}
+tr188:
+#line 11 "nmea.rl"
+	{
+		current_float = 0;
+		current_digit = current_digit*10 + ((*p) - '0');
+	}
+	goto st143;
+tr185:
+#line 5 "nmea.rl"
+	{if(current_digit) {gsa_prns[gsa_prn_index] = current_digit;} gsa_prn_index++; current_digit = 0; }
 	goto st143;
 st143:
 	if ( ++p == pe )
 		goto _out143;
 case 143:
-#line 2297 "../ext/nmea.cpp"
+#line 2320 "../ext/nmea.cpp"
 	if ( (*p) == 44 )
-		goto st144;
+		goto tr187;
 	if ( 48 <= (*p) && (*p) <= 57 )
 		goto tr188;
 	goto st0;
-tr199:
+tr190:
 #line 11 "nmea.rl"
-	{ gsa_hdop = current_float; current_float = 0;}
+	{
+		current_float = 0;
+		current_digit = current_digit*10 + ((*p) - '0');
+	}
+	goto st144;
+tr187:
+#line 5 "nmea.rl"
+	{if(current_digit) {gsa_prns[gsa_prn_index] = current_digit;} gsa_prn_index++; current_digit = 0; }
 	goto st144;
 st144:
 	if ( ++p == pe )
 		goto _out144;
 case 144:
-#line 2311 "../ext/nmea.cpp"
-	if ( (*p) == 42 )
+#line 2341 "../ext/nmea.cpp"
+	if ( (*p) == 44 )
 		goto tr189;
 	if ( 48 <= (*p) && (*p) <= 57 )
 		goto tr190;
 	goto st0;
+tr192:
+#line 11 "nmea.rl"
+	{
+		current_float = 0;
+		current_digit = current_digit*10 + ((*p) - '0');
+	}
+	goto st145;
 tr189:
-#line 82 "nmea.rl"
-	{sentence_end = p; }
+#line 5 "nmea.rl"
+	{if(current_digit) {gsa_prns[gsa_prn_index] = current_digit;} gsa_prn_index++; current_digit = 0; }
 	goto st145;
 st145:
 	if ( ++p == pe )
 		goto _out145;
 case 145:
-#line 2325 "../ext/nmea.cpp"
-	if ( (*p) < 65 ) {
-		if ( 48 <= (*p) && (*p) <= 57 )
-			goto tr191;
-	} else if ( (*p) > 90 ) {
-		if ( 97 <= (*p) && (*p) <= 122 )
-			goto tr191;
-	} else
+#line 2362 "../ext/nmea.cpp"
+	if ( (*p) == 44 )
 		goto tr191;
+	if ( 48 <= (*p) && (*p) <= 57 )
+		goto tr192;
 	goto st0;
+tr194:
+#line 11 "nmea.rl"
+	{
+		current_float = 0;
+		current_digit = current_digit*10 + ((*p) - '0');
+	}
+	goto st146;
 tr191:
-#line 82 "nmea.rl"
-	{checksum[0] = (*p);}
+#line 5 "nmea.rl"
+	{if(current_digit) {gsa_prns[gsa_prn_index] = current_digit;} gsa_prn_index++; current_digit = 0; }
 	goto st146;
 st146:
 	if ( ++p == pe )
 		goto _out146;
 case 146:
-#line 2343 "../ext/nmea.cpp"
+#line 2383 "../ext/nmea.cpp"
+	if ( (*p) == 44 )
+		goto tr193;
+	if ( 48 <= (*p) && (*p) <= 57 )
+		goto tr194;
+	goto st0;
+tr196:
+#line 11 "nmea.rl"
+	{
+		current_float = 0;
+		current_digit = current_digit*10 + ((*p) - '0');
+	}
+	goto st147;
+tr193:
+#line 5 "nmea.rl"
+	{if(current_digit) {gsa_prns[gsa_prn_index] = current_digit;} gsa_prn_index++; current_digit = 0; }
+	goto st147;
+st147:
+	if ( ++p == pe )
+		goto _out147;
+case 147:
+#line 2404 "../ext/nmea.cpp"
+	if ( (*p) == 44 )
+		goto tr195;
+	if ( 48 <= (*p) && (*p) <= 57 )
+		goto tr196;
+	goto st0;
+tr198:
+#line 11 "nmea.rl"
+	{
+		current_float = 0;
+		current_digit = current_digit*10 + ((*p) - '0');
+	}
+	goto st148;
+tr195:
+#line 5 "nmea.rl"
+	{if(current_digit) {gsa_prns[gsa_prn_index] = current_digit;} gsa_prn_index++; current_digit = 0; }
+	goto st148;
+st148:
+	if ( ++p == pe )
+		goto _out148;
+case 148:
+#line 2425 "../ext/nmea.cpp"
+	if ( (*p) == 44 )
+		goto tr197;
+	if ( 48 <= (*p) && (*p) <= 57 )
+		goto tr198;
+	goto st0;
+tr200:
+#line 11 "nmea.rl"
+	{
+		current_float = 0;
+		current_digit = current_digit*10 + ((*p) - '0');
+	}
+	goto st149;
+tr197:
+#line 5 "nmea.rl"
+	{if(current_digit) {gsa_prns[gsa_prn_index] = current_digit;} gsa_prn_index++; current_digit = 0; }
+	goto st149;
+st149:
+	if ( ++p == pe )
+		goto _out149;
+case 149:
+#line 2446 "../ext/nmea.cpp"
+	if ( (*p) == 44 )
+		goto tr199;
+	if ( 48 <= (*p) && (*p) <= 57 )
+		goto tr200;
+	goto st0;
+tr202:
+#line 11 "nmea.rl"
+	{
+		current_float = 0;
+		current_digit = current_digit*10 + ((*p) - '0');
+	}
+	goto st150;
+tr199:
+#line 5 "nmea.rl"
+	{if(current_digit) {gsa_prns[gsa_prn_index] = current_digit;} gsa_prn_index++; current_digit = 0; }
+	goto st150;
+st150:
+	if ( ++p == pe )
+		goto _out150;
+case 150:
+#line 2467 "../ext/nmea.cpp"
+	if ( (*p) == 44 )
+		goto tr201;
+	if ( 48 <= (*p) && (*p) <= 57 )
+		goto tr202;
+	goto st0;
+tr204:
+#line 11 "nmea.rl"
+	{
+		current_float = 0;
+		current_digit = current_digit*10 + ((*p) - '0');
+	}
+	goto st151;
+tr201:
+#line 5 "nmea.rl"
+	{if(current_digit) {gsa_prns[gsa_prn_index] = current_digit;} gsa_prn_index++; current_digit = 0; }
+	goto st151;
+st151:
+	if ( ++p == pe )
+		goto _out151;
+case 151:
+#line 2488 "../ext/nmea.cpp"
+	if ( (*p) == 44 )
+		goto tr203;
+	if ( 48 <= (*p) && (*p) <= 57 )
+		goto tr204;
+	goto st0;
+tr203:
+#line 5 "nmea.rl"
+	{if(current_digit) {gsa_prns[gsa_prn_index] = current_digit;} gsa_prn_index++; current_digit = 0; }
+	goto st152;
+st152:
+	if ( ++p == pe )
+		goto _out152;
+case 152:
+#line 2502 "../ext/nmea.cpp"
+	switch( (*p) ) {
+		case 44: goto st153;
+		case 45: goto st166;
+	}
+	if ( 48 <= (*p) && (*p) <= 57 )
+		goto tr207;
+	goto st0;
+tr229:
+#line 28 "nmea.rl"
+	{current_float = current_float*sign; sign = 1;}
+#line 10 "nmea.rl"
+	{ gsa_pdop = current_float; current_float = 0;}
+	goto st153;
+st153:
+	if ( ++p == pe )
+		goto _out153;
+case 153:
+#line 2520 "../ext/nmea.cpp"
+	switch( (*p) ) {
+		case 44: goto st154;
+		case 45: goto st162;
+	}
+	if ( 48 <= (*p) && (*p) <= 57 )
+		goto tr210;
+	goto st0;
+tr225:
+#line 28 "nmea.rl"
+	{current_float = current_float*sign; sign = 1;}
+#line 11 "nmea.rl"
+	{ gsa_hdop = current_float; current_float = 0;}
+	goto st154;
+st154:
+	if ( ++p == pe )
+		goto _out154;
+case 154:
+#line 2538 "../ext/nmea.cpp"
+	switch( (*p) ) {
+		case 42: goto tr211;
+		case 45: goto st158;
+	}
+	if ( 48 <= (*p) && (*p) <= 57 )
+		goto tr213;
+	goto st0;
+tr211:
+#line 82 "nmea.rl"
+	{sentence_end = p; }
+	goto st155;
+tr221:
+#line 28 "nmea.rl"
+	{current_float = current_float*sign; sign = 1;}
+#line 82 "nmea.rl"
+	{sentence_end = p; }
+	goto st155;
+st155:
+	if ( ++p == pe )
+		goto _out155;
+case 155:
+#line 2560 "../ext/nmea.cpp"
 	if ( (*p) < 65 ) {
 		if ( 48 <= (*p) && (*p) <= 57 )
-			goto tr192;
+			goto tr214;
 	} else if ( (*p) > 90 ) {
 		if ( 97 <= (*p) && (*p) <= 122 )
-			goto tr192;
+			goto tr214;
 	} else
-		goto tr192;
+		goto tr214;
 	goto st0;
-tr192:
+tr214:
+#line 82 "nmea.rl"
+	{checksum[0] = (*p);}
+	goto st156;
+st156:
+	if ( ++p == pe )
+		goto _out156;
+case 156:
+#line 2578 "../ext/nmea.cpp"
+	if ( (*p) < 65 ) {
+		if ( 48 <= (*p) && (*p) <= 57 )
+			goto tr215;
+	} else if ( (*p) > 90 ) {
+		if ( 97 <= (*p) && (*p) <= 122 )
+			goto tr215;
+	} else
+		goto tr215;
+	goto st0;
+tr215:
 #line 68 "nmea.rl"
 	{
 		checksum[1] = (*p);
@@ -2365,184 +2600,34 @@ tr192:
 			throw DataError(buf);
 		}
 	}
-	goto st147;
-st147:
-	if ( ++p == pe )
-		goto _out147;
-case 147:
-#line 2374 "../ext/nmea.cpp"
-	switch( (*p) ) {
-		case 10: goto tr193;
-		case 13: goto tr194;
-	}
-	goto st0;
-tr190:
-#line 11 "nmea.rl"
-	{
-		current_float = 0;
-		current_digit = current_digit*10 + ((*p) - '0');
-	}
-	goto st148;
-st148:
-	if ( ++p == pe )
-		goto _out148;
-case 148:
-#line 2391 "../ext/nmea.cpp"
-	if ( (*p) == 46 )
-		goto tr195;
-	if ( 48 <= (*p) && (*p) <= 57 )
-		goto tr190;
-	goto st0;
-tr195:
-#line 15 "nmea.rl"
-	{
-		current_frac = 10;
-		current_float = current_digit;
-		current_digit = 0;
-	}
-	goto st149;
-st149:
-	if ( ++p == pe )
-		goto _out149;
-case 149:
-#line 2409 "../ext/nmea.cpp"
-	if ( 48 <= (*p) && (*p) <= 57 )
-		goto tr196;
-	goto st0;
-tr196:
-#line 20 "nmea.rl"
-	{
-		current_float += ((*p) - '0')*1.0 / current_frac;
-		current_frac *= 10;
-	}
-#line 12 "nmea.rl"
-	{ gsa_vdop = current_float; current_float = 0;}
-	goto st150;
-st150:
-	if ( ++p == pe )
-		goto _out150;
-case 150:
-#line 2426 "../ext/nmea.cpp"
-	if ( (*p) == 42 )
-		goto tr189;
-	if ( 48 <= (*p) && (*p) <= 57 )
-		goto tr196;
-	goto st0;
-tr188:
-#line 11 "nmea.rl"
-	{
-		current_float = 0;
-		current_digit = current_digit*10 + ((*p) - '0');
-	}
-	goto st151;
-st151:
-	if ( ++p == pe )
-		goto _out151;
-case 151:
-#line 2443 "../ext/nmea.cpp"
-	if ( (*p) == 46 )
-		goto tr197;
-	if ( 48 <= (*p) && (*p) <= 57 )
-		goto tr188;
-	goto st0;
-tr197:
-#line 15 "nmea.rl"
-	{
-		current_frac = 10;
-		current_float = current_digit;
-		current_digit = 0;
-	}
-	goto st152;
-st152:
-	if ( ++p == pe )
-		goto _out152;
-case 152:
-#line 2461 "../ext/nmea.cpp"
-	if ( 48 <= (*p) && (*p) <= 57 )
-		goto tr198;
-	goto st0;
-tr198:
-#line 20 "nmea.rl"
-	{
-		current_float += ((*p) - '0')*1.0 / current_frac;
-		current_frac *= 10;
-	}
-	goto st153;
-st153:
-	if ( ++p == pe )
-		goto _out153;
-case 153:
-#line 2476 "../ext/nmea.cpp"
-	if ( (*p) == 44 )
-		goto tr199;
-	if ( 48 <= (*p) && (*p) <= 57 )
-		goto tr198;
-	goto st0;
-tr186:
-#line 11 "nmea.rl"
-	{
-		current_float = 0;
-		current_digit = current_digit*10 + ((*p) - '0');
-	}
-	goto st154;
-st154:
-	if ( ++p == pe )
-		goto _out154;
-case 154:
-#line 2493 "../ext/nmea.cpp"
-	if ( (*p) == 46 )
-		goto tr200;
-	if ( 48 <= (*p) && (*p) <= 57 )
-		goto tr186;
-	goto st0;
-tr200:
-#line 15 "nmea.rl"
-	{
-		current_frac = 10;
-		current_float = current_digit;
-		current_digit = 0;
-	}
-	goto st155;
-st155:
-	if ( ++p == pe )
-		goto _out155;
-case 155:
-#line 2511 "../ext/nmea.cpp"
-	if ( 48 <= (*p) && (*p) <= 57 )
-		goto tr201;
-	goto st0;
-tr201:
-#line 20 "nmea.rl"
-	{
-		current_float += ((*p) - '0')*1.0 / current_frac;
-		current_frac *= 10;
-	}
-	goto st156;
-st156:
-	if ( ++p == pe )
-		goto _out156;
-case 156:
-#line 2526 "../ext/nmea.cpp"
-	if ( (*p) == 44 )
-		goto tr202;
-	if ( 48 <= (*p) && (*p) <= 57 )
-		goto tr201;
-	goto st0;
+	goto st157;
 st157:
 	if ( ++p == pe )
 		goto _out157;
 case 157:
-	if ( (*p) == 44 )
-		goto st158;
+#line 2609 "../ext/nmea.cpp"
+	switch( (*p) ) {
+		case 10: goto tr216;
+		case 13: goto tr217;
+	}
 	goto st0;
 st158:
 	if ( ++p == pe )
 		goto _out158;
 case 158:
 	if ( 48 <= (*p) && (*p) <= 57 )
-		goto tr204;
+		goto tr218;
 	goto st0;
-tr204:
+tr213:
+#line 11 "nmea.rl"
+	{
+		current_float = 0;
+		current_digit = current_digit*10 + ((*p) - '0');
+	}
+	goto st159;
+tr218:
+#line 28 "nmea.rl"
+	{sign = -1;}
 #line 11 "nmea.rl"
 	{
 		current_float = 0;
@@ -2553,57 +2638,64 @@ st159:
 	if ( ++p == pe )
 		goto _out159;
 case 159:
-#line 2557 "../ext/nmea.cpp"
-	if ( (*p) == 44 )
-		goto tr205;
+#line 2642 "../ext/nmea.cpp"
+	if ( (*p) == 46 )
+		goto tr219;
 	if ( 48 <= (*p) && (*p) <= 57 )
-		goto tr204;
+		goto tr213;
 	goto st0;
-tr205:
-#line 4 "nmea.rl"
-	{total_gsv_number = current_digit; current_digit = 0;}
+tr219:
+#line 15 "nmea.rl"
+	{
+		current_frac = 10;
+		current_float = current_digit;
+		current_digit = 0;
+	}
 	goto st160;
 st160:
 	if ( ++p == pe )
 		goto _out160;
 case 160:
-#line 2571 "../ext/nmea.cpp"
+#line 2660 "../ext/nmea.cpp"
 	if ( 48 <= (*p) && (*p) <= 57 )
-		goto tr206;
+		goto tr220;
 	goto st0;
-tr206:
-#line 11 "nmea.rl"
+tr220:
+#line 20 "nmea.rl"
 	{
-		current_float = 0;
-		current_digit = current_digit*10 + ((*p) - '0');
+		current_float += ((*p) - '0')*1.0 / current_frac;
+		current_frac *= 10;
 	}
+#line 12 "nmea.rl"
+	{ gsa_vdop = current_float; current_float = 0;}
 	goto st161;
 st161:
 	if ( ++p == pe )
 		goto _out161;
 case 161:
-#line 2586 "../ext/nmea.cpp"
-	if ( (*p) == 44 )
-		goto tr207;
+#line 2677 "../ext/nmea.cpp"
+	if ( (*p) == 42 )
+		goto tr221;
 	if ( 48 <= (*p) && (*p) <= 57 )
-		goto tr206;
+		goto tr220;
 	goto st0;
-tr207:
-#line 6 "nmea.rl"
-	{
-		current_gsv_number = current_digit;
-		current_digit = 0;
-	}
-	goto st162;
 st162:
 	if ( ++p == pe )
 		goto _out162;
 case 162:
-#line 2603 "../ext/nmea.cpp"
 	if ( 48 <= (*p) && (*p) <= 57 )
-		goto tr208;
+		goto tr222;
 	goto st0;
-tr208:
+tr210:
+#line 11 "nmea.rl"
+	{
+		current_float = 0;
+		current_digit = current_digit*10 + ((*p) - '0');
+	}
+	goto st163;
+tr222:
+#line 28 "nmea.rl"
+	{sign = -1;}
 #line 11 "nmea.rl"
 	{
 		current_float = 0;
@@ -2614,71 +2706,62 @@ st163:
 	if ( ++p == pe )
 		goto _out163;
 case 163:
-#line 2618 "../ext/nmea.cpp"
-	if ( (*p) == 44 )
-		goto tr209;
+#line 2710 "../ext/nmea.cpp"
+	if ( (*p) == 46 )
+		goto tr223;
 	if ( 48 <= (*p) && (*p) <= 57 )
-		goto tr208;
+		goto tr210;
 	goto st0;
-tr209:
-#line 11 "nmea.rl"
-	{total_satellites = current_digit; current_digit = 0;}
+tr223:
+#line 15 "nmea.rl"
+	{
+		current_frac = 10;
+		current_float = current_digit;
+		current_digit = 0;
+	}
 	goto st164;
 st164:
 	if ( ++p == pe )
 		goto _out164;
 case 164:
-#line 2632 "../ext/nmea.cpp"
+#line 2728 "../ext/nmea.cpp"
 	if ( 48 <= (*p) && (*p) <= 57 )
-		goto tr210;
+		goto tr224;
 	goto st0;
-tr210:
-#line 11 "nmea.rl"
+tr224:
+#line 20 "nmea.rl"
 	{
-		current_float = 0;
-		current_digit = current_digit*10 + ((*p) - '0');
-	}
-	goto st165;
-tr223:
-#line 18 "nmea.rl"
-	{
-		SatelliteInfo satellite;
-		satellite.number = satellite_number;
-		satellite.elevation = elevation;
-		satellite.azimuth = azimuth;
-		satellite.signal_level = snr_db;
-		snr_db.nil = true;
-		satellites.push_back(satellite);
-	}
-#line 11 "nmea.rl"
-	{
-		current_float = 0;
-		current_digit = current_digit*10 + ((*p) - '0');
+		current_float += ((*p) - '0')*1.0 / current_frac;
+		current_frac *= 10;
 	}
 	goto st165;
 st165:
 	if ( ++p == pe )
 		goto _out165;
 case 165:
-#line 2664 "../ext/nmea.cpp"
+#line 2743 "../ext/nmea.cpp"
 	if ( (*p) == 44 )
-		goto tr211;
+		goto tr225;
 	if ( 48 <= (*p) && (*p) <= 57 )
-		goto tr210;
+		goto tr224;
 	goto st0;
-tr211:
-#line 14 "nmea.rl"
-	{satellite_number = current_digit; current_digit = 0; }
-	goto st166;
 st166:
 	if ( ++p == pe )
 		goto _out166;
 case 166:
-#line 2678 "../ext/nmea.cpp"
 	if ( 48 <= (*p) && (*p) <= 57 )
-		goto tr212;
+		goto tr226;
 	goto st0;
-tr212:
+tr207:
+#line 11 "nmea.rl"
+	{
+		current_float = 0;
+		current_digit = current_digit*10 + ((*p) - '0');
+	}
+	goto st167;
+tr226:
+#line 28 "nmea.rl"
+	{sign = -1;}
 #line 11 "nmea.rl"
 	{
 		current_float = 0;
@@ -2689,58 +2772,258 @@ st167:
 	if ( ++p == pe )
 		goto _out167;
 case 167:
-#line 2693 "../ext/nmea.cpp"
-	if ( (*p) == 44 )
-		goto tr213;
+#line 2776 "../ext/nmea.cpp"
+	if ( (*p) == 46 )
+		goto tr227;
 	if ( 48 <= (*p) && (*p) <= 57 )
-		goto tr212;
+		goto tr207;
 	goto st0;
-tr213:
+tr227:
 #line 15 "nmea.rl"
-	{elevation = current_digit; current_digit = 0;}
+	{
+		current_frac = 10;
+		current_float = current_digit;
+		current_digit = 0;
+	}
 	goto st168;
 st168:
 	if ( ++p == pe )
 		goto _out168;
 case 168:
-#line 2707 "../ext/nmea.cpp"
+#line 2794 "../ext/nmea.cpp"
 	if ( 48 <= (*p) && (*p) <= 57 )
-		goto tr214;
+		goto tr228;
 	goto st0;
-tr214:
-#line 11 "nmea.rl"
+tr228:
+#line 20 "nmea.rl"
 	{
-		current_float = 0;
-		current_digit = current_digit*10 + ((*p) - '0');
+		current_float += ((*p) - '0')*1.0 / current_frac;
+		current_frac *= 10;
 	}
 	goto st169;
 st169:
 	if ( ++p == pe )
 		goto _out169;
 case 169:
-#line 2722 "../ext/nmea.cpp"
+#line 2809 "../ext/nmea.cpp"
 	if ( (*p) == 44 )
-		goto tr215;
+		goto tr229;
 	if ( 48 <= (*p) && (*p) <= 57 )
-		goto tr214;
+		goto tr228;
 	goto st0;
-tr215:
-#line 16 "nmea.rl"
-	{azimuth = current_digit; current_digit = 0; }
-	goto st170;
 st170:
 	if ( ++p == pe )
 		goto _out170;
 case 170:
-#line 2736 "../ext/nmea.cpp"
+	if ( (*p) == 44 )
+		goto st171;
+	goto st0;
+st171:
+	if ( ++p == pe )
+		goto _out171;
+case 171:
+	if ( 48 <= (*p) && (*p) <= 57 )
+		goto tr231;
+	goto st0;
+tr231:
+#line 11 "nmea.rl"
+	{
+		current_float = 0;
+		current_digit = current_digit*10 + ((*p) - '0');
+	}
+	goto st172;
+st172:
+	if ( ++p == pe )
+		goto _out172;
+case 172:
+#line 2840 "../ext/nmea.cpp"
+	if ( (*p) == 44 )
+		goto tr232;
+	if ( 48 <= (*p) && (*p) <= 57 )
+		goto tr231;
+	goto st0;
+tr232:
+#line 4 "nmea.rl"
+	{total_gsv_number = current_digit; current_digit = 0;}
+	goto st173;
+st173:
+	if ( ++p == pe )
+		goto _out173;
+case 173:
+#line 2854 "../ext/nmea.cpp"
+	if ( 48 <= (*p) && (*p) <= 57 )
+		goto tr233;
+	goto st0;
+tr233:
+#line 11 "nmea.rl"
+	{
+		current_float = 0;
+		current_digit = current_digit*10 + ((*p) - '0');
+	}
+	goto st174;
+st174:
+	if ( ++p == pe )
+		goto _out174;
+case 174:
+#line 2869 "../ext/nmea.cpp"
+	if ( (*p) == 44 )
+		goto tr234;
+	if ( 48 <= (*p) && (*p) <= 57 )
+		goto tr233;
+	goto st0;
+tr234:
+#line 6 "nmea.rl"
+	{
+		current_gsv_number = current_digit;
+		current_digit = 0;
+	}
+	goto st175;
+st175:
+	if ( ++p == pe )
+		goto _out175;
+case 175:
+#line 2886 "../ext/nmea.cpp"
+	if ( 48 <= (*p) && (*p) <= 57 )
+		goto tr235;
+	goto st0;
+tr235:
+#line 11 "nmea.rl"
+	{
+		current_float = 0;
+		current_digit = current_digit*10 + ((*p) - '0');
+	}
+	goto st176;
+st176:
+	if ( ++p == pe )
+		goto _out176;
+case 176:
+#line 2901 "../ext/nmea.cpp"
+	if ( (*p) == 44 )
+		goto tr236;
+	if ( 48 <= (*p) && (*p) <= 57 )
+		goto tr235;
+	goto st0;
+tr236:
+#line 11 "nmea.rl"
+	{total_satellites = current_digit; current_digit = 0;}
+	goto st177;
+st177:
+	if ( ++p == pe )
+		goto _out177;
+case 177:
+#line 2915 "../ext/nmea.cpp"
+	if ( 48 <= (*p) && (*p) <= 57 )
+		goto tr237;
+	goto st0;
+tr237:
+#line 11 "nmea.rl"
+	{
+		current_float = 0;
+		current_digit = current_digit*10 + ((*p) - '0');
+	}
+	goto st178;
+tr250:
+#line 18 "nmea.rl"
+	{
+		SatelliteInfo satellite;
+		satellite.number = satellite_number;
+		satellite.elevation = elevation;
+		satellite.azimuth = azimuth;
+		satellite.signal_level = snr_db;
+		snr_db.nil = true;
+		satellites.push_back(satellite);
+	}
+#line 11 "nmea.rl"
+	{
+		current_float = 0;
+		current_digit = current_digit*10 + ((*p) - '0');
+	}
+	goto st178;
+st178:
+	if ( ++p == pe )
+		goto _out178;
+case 178:
+#line 2947 "../ext/nmea.cpp"
+	if ( (*p) == 44 )
+		goto tr238;
+	if ( 48 <= (*p) && (*p) <= 57 )
+		goto tr237;
+	goto st0;
+tr238:
+#line 14 "nmea.rl"
+	{satellite_number = current_digit; current_digit = 0; }
+	goto st179;
+st179:
+	if ( ++p == pe )
+		goto _out179;
+case 179:
+#line 2961 "../ext/nmea.cpp"
+	if ( 48 <= (*p) && (*p) <= 57 )
+		goto tr239;
+	goto st0;
+tr239:
+#line 11 "nmea.rl"
+	{
+		current_float = 0;
+		current_digit = current_digit*10 + ((*p) - '0');
+	}
+	goto st180;
+st180:
+	if ( ++p == pe )
+		goto _out180;
+case 180:
+#line 2976 "../ext/nmea.cpp"
+	if ( (*p) == 44 )
+		goto tr240;
+	if ( 48 <= (*p) && (*p) <= 57 )
+		goto tr239;
+	goto st0;
+tr240:
+#line 15 "nmea.rl"
+	{elevation = current_digit; current_digit = 0;}
+	goto st181;
+st181:
+	if ( ++p == pe )
+		goto _out181;
+case 181:
+#line 2990 "../ext/nmea.cpp"
+	if ( 48 <= (*p) && (*p) <= 57 )
+		goto tr241;
+	goto st0;
+tr241:
+#line 11 "nmea.rl"
+	{
+		current_float = 0;
+		current_digit = current_digit*10 + ((*p) - '0');
+	}
+	goto st182;
+st182:
+	if ( ++p == pe )
+		goto _out182;
+case 182:
+#line 3005 "../ext/nmea.cpp"
+	if ( (*p) == 44 )
+		goto tr242;
+	if ( 48 <= (*p) && (*p) <= 57 )
+		goto tr241;
+	goto st0;
+tr242:
+#line 16 "nmea.rl"
+	{azimuth = current_digit; current_digit = 0; }
+	goto st183;
+st183:
+	if ( ++p == pe )
+		goto _out183;
+case 183:
+#line 3019 "../ext/nmea.cpp"
 	switch( (*p) ) {
-		case 42: goto tr216;
-		case 44: goto st174;
+		case 42: goto tr243;
+		case 44: goto st187;
 	}
 	if ( 48 <= (*p) && (*p) <= 57 )
-		goto tr218;
+		goto tr245;
 	goto st0;
-tr216:
+tr243:
 #line 18 "nmea.rl"
 	{
 		SatelliteInfo satellite;
@@ -2753,40 +3036,40 @@ tr216:
 	}
 #line 82 "nmea.rl"
 	{sentence_end = p; }
-	goto st171;
-st171:
+	goto st184;
+st184:
 	if ( ++p == pe )
-		goto _out171;
-case 171:
-#line 2762 "../ext/nmea.cpp"
+		goto _out184;
+case 184:
+#line 3045 "../ext/nmea.cpp"
 	if ( (*p) < 65 ) {
 		if ( 48 <= (*p) && (*p) <= 57 )
-			goto tr219;
+			goto tr246;
 	} else if ( (*p) > 90 ) {
 		if ( 97 <= (*p) && (*p) <= 122 )
-			goto tr219;
+			goto tr246;
 	} else
-		goto tr219;
+		goto tr246;
 	goto st0;
-tr219:
+tr246:
 #line 82 "nmea.rl"
 	{checksum[0] = (*p);}
-	goto st172;
-st172:
+	goto st185;
+st185:
 	if ( ++p == pe )
-		goto _out172;
-case 172:
-#line 2780 "../ext/nmea.cpp"
+		goto _out185;
+case 185:
+#line 3063 "../ext/nmea.cpp"
 	if ( (*p) < 65 ) {
 		if ( 48 <= (*p) && (*p) <= 57 )
-			goto tr220;
+			goto tr247;
 	} else if ( (*p) > 90 ) {
 		if ( 97 <= (*p) && (*p) <= 122 )
-			goto tr220;
+			goto tr247;
 	} else
-		goto tr220;
+		goto tr247;
 	goto st0;
-tr220:
+tr247:
 #line 68 "nmea.rl"
 	{
 		checksum[1] = (*p);
@@ -2802,265 +3085,70 @@ tr220:
 			throw DataError(buf);
 		}
 	}
-	goto st173;
-st173:
-	if ( ++p == pe )
-		goto _out173;
-case 173:
-#line 2811 "../ext/nmea.cpp"
-	switch( (*p) ) {
-		case 10: goto tr221;
-		case 13: goto tr222;
-	}
-	goto st0;
-st174:
-	if ( ++p == pe )
-		goto _out174;
-case 174:
-	if ( 48 <= (*p) && (*p) <= 57 )
-		goto tr223;
-	goto st0;
-tr218:
-#line 24 "nmea.rl"
-	{bcd = 10*((*p) - '0');}
-	goto st175;
-st175:
-	if ( ++p == pe )
-		goto _out175;
-case 175:
-#line 2832 "../ext/nmea.cpp"
-	if ( 48 <= (*p) && (*p) <= 57 )
-		goto tr224;
-	goto st0;
-tr224:
-#line 24 "nmea.rl"
-	{bcd += (*p) - '0';}
-#line 17 "nmea.rl"
-	{snr_db = bcd;}
-	goto st176;
-st176:
-	if ( ++p == pe )
-		goto _out176;
-case 176:
-#line 2846 "../ext/nmea.cpp"
-	switch( (*p) ) {
-		case 42: goto tr216;
-		case 44: goto st174;
-	}
-	goto st0;
-st177:
-	if ( ++p == pe )
-		goto _out177;
-case 177:
-	if ( (*p) == 77 )
-		goto st178;
-	goto st0;
-st178:
-	if ( ++p == pe )
-		goto _out178;
-case 178:
-	if ( (*p) == 67 )
-		goto st179;
-	goto st0;
-st179:
-	if ( ++p == pe )
-		goto _out179;
-case 179:
-	if ( (*p) == 44 )
-		goto st180;
-	goto st0;
-st180:
-	if ( ++p == pe )
-		goto _out180;
-case 180:
-	if ( 48 <= (*p) && (*p) <= 57 )
-		goto tr228;
-	goto st0;
-tr228:
-#line 24 "nmea.rl"
-	{bcd = 10*((*p) - '0');}
-	goto st181;
-st181:
-	if ( ++p == pe )
-		goto _out181;
-case 181:
-#line 2888 "../ext/nmea.cpp"
-	if ( 48 <= (*p) && (*p) <= 57 )
-		goto tr229;
-	goto st0;
-tr229:
-#line 24 "nmea.rl"
-	{bcd += (*p) - '0';}
-#line 37 "nmea.rl"
-	{ utc.hour = bcd; }
-	goto st182;
-st182:
-	if ( ++p == pe )
-		goto _out182;
-case 182:
-#line 2902 "../ext/nmea.cpp"
-	if ( 48 <= (*p) && (*p) <= 57 )
-		goto tr230;
-	goto st0;
-tr230:
-#line 24 "nmea.rl"
-	{bcd = 10*((*p) - '0');}
-	goto st183;
-st183:
-	if ( ++p == pe )
-		goto _out183;
-case 183:
-#line 2914 "../ext/nmea.cpp"
-	if ( 48 <= (*p) && (*p) <= 57 )
-		goto tr231;
-	goto st0;
-tr231:
-#line 24 "nmea.rl"
-	{bcd += (*p) - '0';}
-#line 37 "nmea.rl"
-	{ utc.minute = bcd;}
-	goto st184;
-st184:
-	if ( ++p == pe )
-		goto _out184;
-case 184:
-#line 2928 "../ext/nmea.cpp"
-	if ( 48 <= (*p) && (*p) <= 57 )
-		goto tr232;
-	goto st0;
-tr232:
-#line 24 "nmea.rl"
-	{bcd = 10*((*p) - '0');}
-	goto st185;
-st185:
-	if ( ++p == pe )
-		goto _out185;
-case 185:
-#line 2940 "../ext/nmea.cpp"
-	if ( 48 <= (*p) && (*p) <= 57 )
-		goto tr233;
-	goto st0;
-tr233:
-#line 24 "nmea.rl"
-	{bcd += (*p) - '0';}
-#line 37 "nmea.rl"
-	{ utc.second = bcd;}
 	goto st186;
 st186:
 	if ( ++p == pe )
 		goto _out186;
 case 186:
-#line 2954 "../ext/nmea.cpp"
+#line 3094 "../ext/nmea.cpp"
 	switch( (*p) ) {
-		case 44: goto st187;
-		case 46: goto st230;
+		case 10: goto tr248;
+		case 13: goto tr249;
 	}
 	goto st0;
-tr293:
-#line 37 "nmea.rl"
-	{ utc.usec = current_digit; current_digit = 0;}
-	goto st187;
 st187:
 	if ( ++p == pe )
 		goto _out187;
 case 187:
-#line 2968 "../ext/nmea.cpp"
-	switch( (*p) ) {
-		case 65: goto tr236;
-		case 86: goto tr237;
-	}
+	if ( 48 <= (*p) && (*p) <= 57 )
+		goto tr250;
 	goto st0;
-tr236:
-#line 5 "nmea.rl"
-	{rmc_valid = true;}
-	goto st188;
-tr237:
-#line 5 "nmea.rl"
-	{rmc_valid = false;}
+tr245:
+#line 24 "nmea.rl"
+	{bcd = 10*((*p) - '0');}
 	goto st188;
 st188:
 	if ( ++p == pe )
 		goto _out188;
 case 188:
-#line 2986 "../ext/nmea.cpp"
-	if ( (*p) == 44 )
-		goto st189;
+#line 3115 "../ext/nmea.cpp"
+	if ( 48 <= (*p) && (*p) <= 57 )
+		goto tr251;
 	goto st0;
+tr251:
+#line 24 "nmea.rl"
+	{bcd += (*p) - '0';}
+#line 17 "nmea.rl"
+	{snr_db = bcd;}
+	goto st189;
 st189:
 	if ( ++p == pe )
 		goto _out189;
 case 189:
-	if ( (*p) == 44 )
-		goto st190;
-	if ( 48 <= (*p) && (*p) <= 57 )
-		goto tr240;
+#line 3129 "../ext/nmea.cpp"
+	switch( (*p) ) {
+		case 42: goto tr243;
+		case 44: goto st187;
+	}
 	goto st0;
-tr290:
-#line 46 "nmea.rl"
-	{
-		latitude.nil = false;
-		latitude.value.degrees = current_degrees;
-		latitude.value.minutes = current_float;
-		current_float = 0;
-		current_degrees = 0;
-	}
-	goto st190;
-tr291:
-#line 45 "nmea.rl"
-	{current_degrees *= -1;}
-#line 46 "nmea.rl"
-	{
-		latitude.nil = false;
-		latitude.value.degrees = current_degrees;
-		latitude.value.minutes = current_float;
-		current_float = 0;
-		current_degrees = 0;
-	}
-	goto st190;
 st190:
 	if ( ++p == pe )
 		goto _out190;
 case 190:
-#line 3025 "../ext/nmea.cpp"
-	if ( (*p) == 44 )
+	if ( (*p) == 77 )
 		goto st191;
 	goto st0;
 st191:
 	if ( ++p == pe )
 		goto _out191;
 case 191:
-	if ( (*p) == 44 )
+	if ( (*p) == 67 )
 		goto st192;
-	if ( 48 <= (*p) && (*p) <= 57 )
-		goto tr243;
 	goto st0;
-tr283:
-#line 56 "nmea.rl"
-	{
-		longitude.nil = false;
-		longitude.value.degrees = current_degrees;
-		longitude.value.minutes = current_float;
-		current_degrees = 0;
-		current_float = 0;
-	}
-	goto st192;
-tr284:
-#line 55 "nmea.rl"
-	{current_degrees *= -1;}
-#line 56 "nmea.rl"
-	{
-		longitude.nil = false;
-		longitude.value.degrees = current_degrees;
-		longitude.value.minutes = current_float;
-		current_degrees = 0;
-		current_float = 0;
-	}
-	goto st192;
 st192:
 	if ( ++p == pe )
 		goto _out192;
 case 192:
-#line 3064 "../ext/nmea.cpp"
 	if ( (*p) == 44 )
 		goto st193;
 	goto st0;
@@ -3068,38 +3156,36 @@ st193:
 	if ( ++p == pe )
 		goto _out193;
 case 193:
-	if ( (*p) == 44 )
-		goto st194;
 	if ( 48 <= (*p) && (*p) <= 57 )
-		goto tr246;
+		goto tr255;
 	goto st0;
-tr276:
-#line 6 "nmea.rl"
-	{knot_speed = current_float; current_float = 0;}
+tr255:
+#line 24 "nmea.rl"
+	{bcd = 10*((*p) - '0');}
 	goto st194;
 st194:
 	if ( ++p == pe )
 		goto _out194;
 case 194:
-#line 3085 "../ext/nmea.cpp"
-	if ( (*p) == 44 )
-		goto st195;
+#line 3171 "../ext/nmea.cpp"
 	if ( 48 <= (*p) && (*p) <= 57 )
-		goto tr248;
+		goto tr256;
 	goto st0;
-tr273:
-#line 7 "nmea.rl"
-	{course = current_float; current_float = 0;}
+tr256:
+#line 24 "nmea.rl"
+	{bcd += (*p) - '0';}
+#line 37 "nmea.rl"
+	{ utc.hour = bcd; }
 	goto st195;
 st195:
 	if ( ++p == pe )
 		goto _out195;
 case 195:
-#line 3099 "../ext/nmea.cpp"
+#line 3185 "../ext/nmea.cpp"
 	if ( 48 <= (*p) && (*p) <= 57 )
-		goto tr249;
+		goto tr257;
 	goto st0;
-tr249:
+tr257:
 #line 24 "nmea.rl"
 	{bcd = 10*((*p) - '0');}
 	goto st196;
@@ -3107,25 +3193,25 @@ st196:
 	if ( ++p == pe )
 		goto _out196;
 case 196:
-#line 3111 "../ext/nmea.cpp"
+#line 3197 "../ext/nmea.cpp"
 	if ( 48 <= (*p) && (*p) <= 57 )
-		goto tr250;
+		goto tr258;
 	goto st0;
-tr250:
+tr258:
 #line 24 "nmea.rl"
 	{bcd += (*p) - '0';}
-#line 38 "nmea.rl"
-	{ utc.day = bcd; }
+#line 37 "nmea.rl"
+	{ utc.minute = bcd;}
 	goto st197;
 st197:
 	if ( ++p == pe )
 		goto _out197;
 case 197:
-#line 3125 "../ext/nmea.cpp"
+#line 3211 "../ext/nmea.cpp"
 	if ( 48 <= (*p) && (*p) <= 57 )
-		goto tr251;
+		goto tr259;
 	goto st0;
-tr251:
+tr259:
 #line 24 "nmea.rl"
 	{bcd = 10*((*p) - '0');}
 	goto st198;
@@ -3133,47 +3219,53 @@ st198:
 	if ( ++p == pe )
 		goto _out198;
 case 198:
-#line 3137 "../ext/nmea.cpp"
+#line 3223 "../ext/nmea.cpp"
 	if ( 48 <= (*p) && (*p) <= 57 )
-		goto tr252;
+		goto tr260;
 	goto st0;
-tr252:
+tr260:
 #line 24 "nmea.rl"
 	{bcd += (*p) - '0';}
-#line 38 "nmea.rl"
-	{ utc.month = bcd;}
+#line 37 "nmea.rl"
+	{ utc.second = bcd;}
 	goto st199;
 st199:
 	if ( ++p == pe )
 		goto _out199;
 case 199:
-#line 3151 "../ext/nmea.cpp"
-	if ( 48 <= (*p) && (*p) <= 57 )
-		goto tr253;
+#line 3237 "../ext/nmea.cpp"
+	switch( (*p) ) {
+		case 44: goto st200;
+		case 46: goto st249;
+	}
 	goto st0;
-tr253:
-#line 24 "nmea.rl"
-	{bcd = 10*((*p) - '0');}
+tr331:
+#line 37 "nmea.rl"
+	{ utc.usec = current_digit; current_digit = 0;}
 	goto st200;
 st200:
 	if ( ++p == pe )
 		goto _out200;
 case 200:
-#line 3163 "../ext/nmea.cpp"
-	if ( 48 <= (*p) && (*p) <= 57 )
-		goto tr254;
+#line 3251 "../ext/nmea.cpp"
+	switch( (*p) ) {
+		case 65: goto tr263;
+		case 86: goto tr264;
+	}
 	goto st0;
-tr254:
-#line 24 "nmea.rl"
-	{bcd += (*p) - '0';}
-#line 38 "nmea.rl"
-	{ utc.year = bcd > 70 ? 1900+bcd : 2000+bcd;}
+tr263:
+#line 5 "nmea.rl"
+	{rmc_valid = true;}
+	goto st201;
+tr264:
+#line 5 "nmea.rl"
+	{rmc_valid = false;}
 	goto st201;
 st201:
 	if ( ++p == pe )
 		goto _out201;
 case 201:
-#line 3177 "../ext/nmea.cpp"
+#line 3269 "../ext/nmea.cpp"
 	if ( (*p) == 44 )
 		goto st202;
 	goto st0;
@@ -3184,457 +3276,480 @@ case 202:
 	if ( (*p) == 44 )
 		goto st203;
 	if ( 48 <= (*p) && (*p) <= 57 )
-		goto tr257;
+		goto tr267;
 	goto st0;
-tr263:
-#line 8 "nmea.rl"
-	{ magnetic_variation = 1.0*current_digit; current_digit = 0; }
+tr328:
+#line 46 "nmea.rl"
+	{
+		latitude.nil = false;
+		latitude.value.degrees = current_degrees;
+		latitude.value.minutes = current_float;
+		current_float = 0;
+		current_degrees = 0;
+	}
 	goto st203;
-tr269:
-#line 8 "nmea.rl"
-	{ magnetic_variation = current_float*current_degrees; current_float = 0; }
+tr329:
+#line 45 "nmea.rl"
+	{current_degrees *= -1;}
+#line 46 "nmea.rl"
+	{
+		latitude.nil = false;
+		latitude.value.degrees = current_degrees;
+		latitude.value.minutes = current_float;
+		current_float = 0;
+		current_degrees = 0;
+	}
 	goto st203;
 st203:
 	if ( ++p == pe )
 		goto _out203;
 case 203:
-#line 3202 "../ext/nmea.cpp"
-	switch( (*p) ) {
-		case 10: goto tr258;
-		case 13: goto tr258;
-	}
-	goto st203;
-tr258:
-#line 10 "nmea.rl"
+#line 3308 "../ext/nmea.cpp"
+	if ( (*p) == 44 )
+		goto st204;
+	goto st0;
+st204:
+	if ( ++p == pe )
+		goto _out204;
+case 204:
+	if ( (*p) == 44 )
+		goto st205;
+	if ( 48 <= (*p) && (*p) <= 57 )
+		goto tr270;
+	goto st0;
+tr319:
+#line 56 "nmea.rl"
 	{
-		handler.rmc(utc, latitude, longitude, knot_speed, course, magnetic_variation);
+		longitude.nil = false;
+		longitude.value.degrees = current_degrees;
+		longitude.value.minutes = current_float;
+		current_degrees = 0;
+		current_float = 0;
 	}
-	goto st277;
-tr264:
+	goto st205;
+tr320:
+#line 55 "nmea.rl"
+	{current_degrees *= -1;}
+#line 56 "nmea.rl"
+	{
+		longitude.nil = false;
+		longitude.value.degrees = current_degrees;
+		longitude.value.minutes = current_float;
+		current_degrees = 0;
+		current_float = 0;
+	}
+	goto st205;
+st205:
+	if ( ++p == pe )
+		goto _out205;
+case 205:
+#line 3347 "../ext/nmea.cpp"
+	if ( (*p) == 44 )
+		goto st206;
+	goto st0;
+st206:
+	if ( ++p == pe )
+		goto _out206;
+case 206:
+	switch( (*p) ) {
+		case 44: goto st207;
+		case 45: goto st230;
+	}
+	if ( 48 <= (*p) && (*p) <= 57 )
+		goto tr274;
+	goto st0;
+tr310:
+#line 28 "nmea.rl"
+	{current_float = current_float*sign; sign = 1;}
+#line 6 "nmea.rl"
+	{knot_speed = current_float; current_float = 0;}
+	goto st207;
+st207:
+	if ( ++p == pe )
+		goto _out207;
+case 207:
+#line 3372 "../ext/nmea.cpp"
+	switch( (*p) ) {
+		case 44: goto st208;
+		case 45: goto st226;
+	}
+	if ( 48 <= (*p) && (*p) <= 57 )
+		goto tr277;
+	goto st0;
+tr306:
+#line 28 "nmea.rl"
+	{current_float = current_float*sign; sign = 1;}
+#line 7 "nmea.rl"
+	{course = current_float; current_float = 0;}
+	goto st208;
+st208:
+	if ( ++p == pe )
+		goto _out208;
+case 208:
+#line 3390 "../ext/nmea.cpp"
+	if ( 48 <= (*p) && (*p) <= 57 )
+		goto tr278;
+	goto st0;
+tr278:
+#line 24 "nmea.rl"
+	{bcd = 10*((*p) - '0');}
+	goto st209;
+st209:
+	if ( ++p == pe )
+		goto _out209;
+case 209:
+#line 3402 "../ext/nmea.cpp"
+	if ( 48 <= (*p) && (*p) <= 57 )
+		goto tr279;
+	goto st0;
+tr279:
+#line 24 "nmea.rl"
+	{bcd += (*p) - '0';}
+#line 38 "nmea.rl"
+	{ utc.day = bcd; }
+	goto st210;
+st210:
+	if ( ++p == pe )
+		goto _out210;
+case 210:
+#line 3416 "../ext/nmea.cpp"
+	if ( 48 <= (*p) && (*p) <= 57 )
+		goto tr280;
+	goto st0;
+tr280:
+#line 24 "nmea.rl"
+	{bcd = 10*((*p) - '0');}
+	goto st211;
+st211:
+	if ( ++p == pe )
+		goto _out211;
+case 211:
+#line 3428 "../ext/nmea.cpp"
+	if ( 48 <= (*p) && (*p) <= 57 )
+		goto tr281;
+	goto st0;
+tr281:
+#line 24 "nmea.rl"
+	{bcd += (*p) - '0';}
+#line 38 "nmea.rl"
+	{ utc.month = bcd;}
+	goto st212;
+st212:
+	if ( ++p == pe )
+		goto _out212;
+case 212:
+#line 3442 "../ext/nmea.cpp"
+	if ( 48 <= (*p) && (*p) <= 57 )
+		goto tr282;
+	goto st0;
+tr282:
+#line 24 "nmea.rl"
+	{bcd = 10*((*p) - '0');}
+	goto st213;
+st213:
+	if ( ++p == pe )
+		goto _out213;
+case 213:
+#line 3454 "../ext/nmea.cpp"
+	if ( 48 <= (*p) && (*p) <= 57 )
+		goto tr283;
+	goto st0;
+tr283:
+#line 24 "nmea.rl"
+	{bcd += (*p) - '0';}
+#line 38 "nmea.rl"
+	{ utc.year = bcd > 70 ? 1900+bcd : 2000+bcd;}
+	goto st214;
+st214:
+	if ( ++p == pe )
+		goto _out214;
+case 214:
+#line 3468 "../ext/nmea.cpp"
+	if ( (*p) == 44 )
+		goto st215;
+	goto st0;
+st215:
+	if ( ++p == pe )
+		goto _out215;
+case 215:
+	switch( (*p) ) {
+		case 44: goto st216;
+		case 45: goto st217;
+	}
+	if ( 48 <= (*p) && (*p) <= 57 )
+		goto tr287;
+	goto st0;
+tr296:
+#line 8 "nmea.rl"
+	{ magnetic_variation = current_float*current_degrees; current_float = 0; }
+	goto st216;
+tr301:
 #line 8 "nmea.rl"
 	{ magnetic_variation = 1.0*current_digit; current_digit = 0; }
+	goto st216;
+st216:
+	if ( ++p == pe )
+		goto _out216;
+case 216:
+#line 3495 "../ext/nmea.cpp"
+	switch( (*p) ) {
+		case 10: goto tr288;
+		case 13: goto tr288;
+	}
+	goto st216;
+tr288:
 #line 10 "nmea.rl"
 	{
 		handler.rmc(utc, latitude, longitude, knot_speed, course, magnetic_variation);
 	}
-	goto st277;
-tr270:
+	goto st300;
+tr297:
 #line 8 "nmea.rl"
 	{ magnetic_variation = current_float*current_degrees; current_float = 0; }
 #line 10 "nmea.rl"
 	{
 		handler.rmc(utc, latitude, longitude, knot_speed, course, magnetic_variation);
 	}
-	goto st277;
-st277:
-	if ( ++p == pe )
-		goto _out277;
-case 277:
-#line 3234 "../ext/nmea.cpp"
-	switch( (*p) ) {
-		case 10: goto tr258;
-		case 13: goto tr258;
-	}
-	goto st203;
-tr257:
-#line 11 "nmea.rl"
-	{
-		current_float = 0;
-		current_digit = current_digit*10 + ((*p) - '0');
-	}
-	goto st204;
-st204:
-	if ( ++p == pe )
-		goto _out204;
-case 204:
-#line 3251 "../ext/nmea.cpp"
-	switch( (*p) ) {
-		case 44: goto st205;
-		case 46: goto tr260;
-	}
-	if ( 48 <= (*p) && (*p) <= 57 )
-		goto tr257;
-	goto st0;
-st205:
-	if ( ++p == pe )
-		goto _out205;
-case 205:
-	switch( (*p) ) {
-		case 69: goto st206;
-		case 87: goto tr262;
-	}
-	goto st0;
-tr262:
-#line 55 "nmea.rl"
-	{current_degrees *= -1;}
-	goto st206;
-st206:
-	if ( ++p == pe )
-		goto _out206;
-case 206:
-#line 3276 "../ext/nmea.cpp"
-	switch( (*p) ) {
-		case 10: goto tr264;
-		case 13: goto tr264;
-	}
-	goto tr263;
-tr260:
-#line 15 "nmea.rl"
-	{
-		current_frac = 10;
-		current_float = current_digit;
-		current_digit = 0;
-	}
-	goto st207;
-st207:
-	if ( ++p == pe )
-		goto _out207;
-case 207:
-#line 3294 "../ext/nmea.cpp"
-	if ( 48 <= (*p) && (*p) <= 57 )
-		goto tr265;
-	goto st0;
-tr265:
-#line 20 "nmea.rl"
-	{
-		current_float += ((*p) - '0')*1.0 / current_frac;
-		current_frac *= 10;
-	}
-	goto st208;
-st208:
-	if ( ++p == pe )
-		goto _out208;
-case 208:
-#line 3309 "../ext/nmea.cpp"
-	if ( (*p) == 44 )
-		goto tr266;
-	if ( 48 <= (*p) && (*p) <= 57 )
-		goto tr265;
-	goto st0;
-tr266:
+	goto st300;
+tr302:
 #line 8 "nmea.rl"
-	{current_degrees = 1;}
-	goto st209;
-st209:
+	{ magnetic_variation = 1.0*current_digit; current_digit = 0; }
+#line 10 "nmea.rl"
+	{
+		handler.rmc(utc, latitude, longitude, knot_speed, course, magnetic_variation);
+	}
+	goto st300;
+st300:
 	if ( ++p == pe )
-		goto _out209;
-case 209:
-#line 3323 "../ext/nmea.cpp"
+		goto _out300;
+case 300:
+#line 3527 "../ext/nmea.cpp"
 	switch( (*p) ) {
-		case 69: goto st210;
-		case 87: goto tr268;
-	}
-	goto st0;
-tr268:
-#line 55 "nmea.rl"
-	{current_degrees *= -1;}
-	goto st210;
-st210:
-	if ( ++p == pe )
-		goto _out210;
-case 210:
-#line 3337 "../ext/nmea.cpp"
-	switch( (*p) ) {
-		case 10: goto tr270;
-		case 13: goto tr270;
-	}
-	goto tr269;
-tr248:
-#line 11 "nmea.rl"
-	{
-		current_float = 0;
-		current_digit = current_digit*10 + ((*p) - '0');
-	}
-	goto st211;
-st211:
-	if ( ++p == pe )
-		goto _out211;
-case 211:
-#line 3354 "../ext/nmea.cpp"
-	if ( (*p) == 46 )
-		goto tr271;
-	if ( 48 <= (*p) && (*p) <= 57 )
-		goto tr248;
-	goto st0;
-tr271:
-#line 15 "nmea.rl"
-	{
-		current_frac = 10;
-		current_float = current_digit;
-		current_digit = 0;
-	}
-	goto st212;
-st212:
-	if ( ++p == pe )
-		goto _out212;
-case 212:
-#line 3372 "../ext/nmea.cpp"
-	if ( 48 <= (*p) && (*p) <= 57 )
-		goto tr272;
-	goto st0;
-tr272:
-#line 20 "nmea.rl"
-	{
-		current_float += ((*p) - '0')*1.0 / current_frac;
-		current_frac *= 10;
-	}
-	goto st213;
-st213:
-	if ( ++p == pe )
-		goto _out213;
-case 213:
-#line 3387 "../ext/nmea.cpp"
-	if ( (*p) == 44 )
-		goto tr273;
-	if ( 48 <= (*p) && (*p) <= 57 )
-		goto tr272;
-	goto st0;
-tr246:
-#line 11 "nmea.rl"
-	{
-		current_float = 0;
-		current_digit = current_digit*10 + ((*p) - '0');
-	}
-	goto st214;
-st214:
-	if ( ++p == pe )
-		goto _out214;
-case 214:
-#line 3404 "../ext/nmea.cpp"
-	if ( (*p) == 46 )
-		goto tr274;
-	if ( 48 <= (*p) && (*p) <= 57 )
-		goto tr246;
-	goto st0;
-tr274:
-#line 15 "nmea.rl"
-	{
-		current_frac = 10;
-		current_float = current_digit;
-		current_digit = 0;
-	}
-	goto st215;
-st215:
-	if ( ++p == pe )
-		goto _out215;
-case 215:
-#line 3422 "../ext/nmea.cpp"
-	if ( 48 <= (*p) && (*p) <= 57 )
-		goto tr275;
-	goto st0;
-tr275:
-#line 20 "nmea.rl"
-	{
-		current_float += ((*p) - '0')*1.0 / current_frac;
-		current_frac *= 10;
+		case 10: goto tr288;
+		case 13: goto tr288;
 	}
 	goto st216;
-st216:
-	if ( ++p == pe )
-		goto _out216;
-case 216:
-#line 3437 "../ext/nmea.cpp"
-	if ( (*p) == 44 )
-		goto tr276;
-	if ( 48 <= (*p) && (*p) <= 57 )
-		goto tr275;
-	goto st0;
-tr243:
-#line 24 "nmea.rl"
-	{bcd = 10*((*p) - '0');}
-	goto st217;
 st217:
 	if ( ++p == pe )
 		goto _out217;
 case 217:
-#line 3451 "../ext/nmea.cpp"
 	if ( 48 <= (*p) && (*p) <= 57 )
-		goto tr277;
+		goto tr289;
 	goto st0;
-tr277:
-#line 24 "nmea.rl"
-	{bcd += (*p) - '0';}
+tr291:
+#line 11 "nmea.rl"
+	{
+		current_float = 0;
+		current_digit = current_digit*10 + ((*p) - '0');
+	}
+	goto st218;
+tr289:
+#line 28 "nmea.rl"
+	{sign = -1;}
+#line 11 "nmea.rl"
+	{
+		current_float = 0;
+		current_digit = current_digit*10 + ((*p) - '0');
+	}
 	goto st218;
 st218:
 	if ( ++p == pe )
 		goto _out218;
 case 218:
-#line 3463 "../ext/nmea.cpp"
+#line 3560 "../ext/nmea.cpp"
+	if ( (*p) == 46 )
+		goto tr290;
 	if ( 48 <= (*p) && (*p) <= 57 )
-		goto tr278;
+		goto tr291;
 	goto st0;
-tr278:
-#line 25 "nmea.rl"
-	{bcd = bcd*10 + ((*p) - '0');}
-#line 40 "nmea.rl"
+tr290:
+#line 15 "nmea.rl"
 	{
-		current_degrees = bcd;
-		bcd = 0;
+		current_frac = 10;
+		current_float = current_digit;
+		current_digit = 0;
 	}
 	goto st219;
 st219:
 	if ( ++p == pe )
 		goto _out219;
 case 219:
-#line 3480 "../ext/nmea.cpp"
+#line 3578 "../ext/nmea.cpp"
 	if ( 48 <= (*p) && (*p) <= 57 )
-		goto tr279;
+		goto tr292;
 	goto st0;
-tr279:
-#line 11 "nmea.rl"
+tr292:
+#line 20 "nmea.rl"
 	{
-		current_float = 0;
-		current_digit = current_digit*10 + ((*p) - '0');
+		current_float += ((*p) - '0')*1.0 / current_frac;
+		current_frac *= 10;
 	}
 	goto st220;
 st220:
 	if ( ++p == pe )
 		goto _out220;
 case 220:
-#line 3495 "../ext/nmea.cpp"
-	if ( (*p) == 46 )
-		goto tr280;
+#line 3593 "../ext/nmea.cpp"
+	if ( (*p) == 44 )
+		goto tr293;
 	if ( 48 <= (*p) && (*p) <= 57 )
-		goto tr279;
+		goto tr292;
 	goto st0;
-tr280:
-#line 15 "nmea.rl"
-	{
-		current_frac = 10;
-		current_float = current_digit;
-		current_digit = 0;
-	}
+tr293:
+#line 28 "nmea.rl"
+	{current_float = current_float*sign; sign = 1;}
+#line 8 "nmea.rl"
+	{current_degrees = 1;}
 	goto st221;
 st221:
 	if ( ++p == pe )
 		goto _out221;
 case 221:
-#line 3513 "../ext/nmea.cpp"
-	if ( 48 <= (*p) && (*p) <= 57 )
-		goto tr281;
-	goto st0;
-tr281:
-#line 20 "nmea.rl"
-	{
-		current_float += ((*p) - '0')*1.0 / current_frac;
-		current_frac *= 10;
+#line 3609 "../ext/nmea.cpp"
+	switch( (*p) ) {
+		case 69: goto st222;
+		case 87: goto tr295;
 	}
+	goto st0;
+tr295:
+#line 55 "nmea.rl"
+	{current_degrees *= -1;}
 	goto st222;
 st222:
 	if ( ++p == pe )
 		goto _out222;
 case 222:
-#line 3528 "../ext/nmea.cpp"
-	if ( (*p) == 44 )
-		goto st223;
-	if ( 48 <= (*p) && (*p) <= 57 )
-		goto tr281;
-	goto st0;
-st223:
-	if ( ++p == pe )
-		goto _out223;
-case 223:
+#line 3623 "../ext/nmea.cpp"
 	switch( (*p) ) {
-		case 69: goto tr283;
-		case 87: goto tr284;
+		case 10: goto tr297;
+		case 13: goto tr297;
 	}
-	goto st0;
-tr240:
-#line 24 "nmea.rl"
-	{bcd = 10*((*p) - '0');}
-	goto st224;
-st224:
-	if ( ++p == pe )
-		goto _out224;
-case 224:
-#line 3551 "../ext/nmea.cpp"
-	if ( 48 <= (*p) && (*p) <= 57 )
-		goto tr285;
-	goto st0;
-tr285:
-#line 24 "nmea.rl"
-	{bcd += (*p) - '0';}
-#line 40 "nmea.rl"
-	{
-		current_degrees = bcd;
-		bcd = 0;
-	}
-	goto st225;
-st225:
-	if ( ++p == pe )
-		goto _out225;
-case 225:
-#line 3568 "../ext/nmea.cpp"
-	if ( 48 <= (*p) && (*p) <= 57 )
-		goto tr286;
-	goto st0;
-tr286:
+	goto tr296;
+tr287:
 #line 11 "nmea.rl"
 	{
 		current_float = 0;
 		current_digit = current_digit*10 + ((*p) - '0');
 	}
-	goto st226;
+	goto st223;
+st223:
+	if ( ++p == pe )
+		goto _out223;
+case 223:
+#line 3640 "../ext/nmea.cpp"
+	switch( (*p) ) {
+		case 44: goto st224;
+		case 46: goto tr290;
+	}
+	if ( 48 <= (*p) && (*p) <= 57 )
+		goto tr287;
+	goto st0;
+st224:
+	if ( ++p == pe )
+		goto _out224;
+case 224:
+	switch( (*p) ) {
+		case 69: goto st225;
+		case 87: goto tr300;
+	}
+	goto st0;
+tr300:
+#line 55 "nmea.rl"
+	{current_degrees *= -1;}
+	goto st225;
+st225:
+	if ( ++p == pe )
+		goto _out225;
+case 225:
+#line 3665 "../ext/nmea.cpp"
+	switch( (*p) ) {
+		case 10: goto tr302;
+		case 13: goto tr302;
+	}
+	goto tr301;
 st226:
 	if ( ++p == pe )
 		goto _out226;
 case 226:
-#line 3583 "../ext/nmea.cpp"
-	if ( (*p) == 46 )
-		goto tr287;
 	if ( 48 <= (*p) && (*p) <= 57 )
-		goto tr286;
+		goto tr303;
 	goto st0;
-tr287:
-#line 15 "nmea.rl"
+tr277:
+#line 11 "nmea.rl"
 	{
-		current_frac = 10;
-		current_float = current_digit;
-		current_digit = 0;
+		current_float = 0;
+		current_digit = current_digit*10 + ((*p) - '0');
+	}
+	goto st227;
+tr303:
+#line 28 "nmea.rl"
+	{sign = -1;}
+#line 11 "nmea.rl"
+	{
+		current_float = 0;
+		current_digit = current_digit*10 + ((*p) - '0');
 	}
 	goto st227;
 st227:
 	if ( ++p == pe )
 		goto _out227;
 case 227:
-#line 3601 "../ext/nmea.cpp"
+#line 3698 "../ext/nmea.cpp"
+	if ( (*p) == 46 )
+		goto tr304;
 	if ( 48 <= (*p) && (*p) <= 57 )
-		goto tr288;
+		goto tr277;
 	goto st0;
-tr288:
-#line 20 "nmea.rl"
+tr304:
+#line 15 "nmea.rl"
 	{
-		current_float += ((*p) - '0')*1.0 / current_frac;
-		current_frac *= 10;
+		current_frac = 10;
+		current_float = current_digit;
+		current_digit = 0;
 	}
 	goto st228;
 st228:
 	if ( ++p == pe )
 		goto _out228;
 case 228:
-#line 3616 "../ext/nmea.cpp"
-	if ( (*p) == 44 )
-		goto st229;
+#line 3716 "../ext/nmea.cpp"
 	if ( 48 <= (*p) && (*p) <= 57 )
-		goto tr288;
+		goto tr305;
 	goto st0;
+tr305:
+#line 20 "nmea.rl"
+	{
+		current_float += ((*p) - '0')*1.0 / current_frac;
+		current_frac *= 10;
+	}
+	goto st229;
 st229:
 	if ( ++p == pe )
 		goto _out229;
 case 229:
-	switch( (*p) ) {
-		case 78: goto tr290;
-		case 83: goto tr291;
-	}
+#line 3731 "../ext/nmea.cpp"
+	if ( (*p) == 44 )
+		goto tr306;
+	if ( 48 <= (*p) && (*p) <= 57 )
+		goto tr305;
 	goto st0;
 st230:
 	if ( ++p == pe )
 		goto _out230;
 case 230:
 	if ( 48 <= (*p) && (*p) <= 57 )
-		goto tr292;
+		goto tr307;
 	goto st0;
-tr292:
+tr274:
+#line 11 "nmea.rl"
+	{
+		current_float = 0;
+		current_digit = current_digit*10 + ((*p) - '0');
+	}
+	goto st231;
+tr307:
+#line 28 "nmea.rl"
+	{sign = -1;}
 #line 11 "nmea.rl"
 	{
 		current_float = 0;
@@ -3645,184 +3760,491 @@ st231:
 	if ( ++p == pe )
 		goto _out231;
 case 231:
-#line 3649 "../ext/nmea.cpp"
-	if ( (*p) == 44 )
-		goto tr293;
+#line 3764 "../ext/nmea.cpp"
+	if ( (*p) == 46 )
+		goto tr308;
 	if ( 48 <= (*p) && (*p) <= 57 )
-		goto tr292;
+		goto tr274;
 	goto st0;
+tr308:
+#line 15 "nmea.rl"
+	{
+		current_frac = 10;
+		current_float = current_digit;
+		current_digit = 0;
+	}
+	goto st232;
 st232:
 	if ( ++p == pe )
 		goto _out232;
 case 232:
-	if ( (*p) == 84 )
-		goto st233;
+#line 3782 "../ext/nmea.cpp"
+	if ( 48 <= (*p) && (*p) <= 57 )
+		goto tr309;
 	goto st0;
+tr309:
+#line 20 "nmea.rl"
+	{
+		current_float += ((*p) - '0')*1.0 / current_frac;
+		current_frac *= 10;
+	}
+	goto st233;
 st233:
 	if ( ++p == pe )
 		goto _out233;
 case 233:
-	if ( (*p) == 71 )
-		goto st234;
+#line 3797 "../ext/nmea.cpp"
+	if ( (*p) == 44 )
+		goto tr310;
+	if ( 48 <= (*p) && (*p) <= 57 )
+		goto tr309;
 	goto st0;
+tr270:
+#line 24 "nmea.rl"
+	{bcd = 10*((*p) - '0');}
+	goto st234;
 st234:
 	if ( ++p == pe )
 		goto _out234;
 case 234:
-	if ( (*p) == 44 )
-		goto st235;
+#line 3811 "../ext/nmea.cpp"
+	if ( 48 <= (*p) && (*p) <= 57 )
+		goto tr311;
 	goto st0;
+tr311:
+#line 24 "nmea.rl"
+	{bcd += (*p) - '0';}
+	goto st235;
 st235:
 	if ( ++p == pe )
 		goto _out235;
 case 235:
-	if ( (*p) == 44 )
-		goto st236;
+#line 3823 "../ext/nmea.cpp"
 	if ( 48 <= (*p) && (*p) <= 57 )
-		goto tr298;
+		goto tr312;
 	goto st0;
-tr333:
-#line 3 "nmea.rl"
-	{true_course = current_float; current_float = 0;}
+tr312:
+#line 25 "nmea.rl"
+	{bcd = bcd*10 + ((*p) - '0');}
+#line 40 "nmea.rl"
+	{
+		current_degrees = bcd;
+		bcd = 0;
+	}
 	goto st236;
 st236:
 	if ( ++p == pe )
 		goto _out236;
 case 236:
-#line 3693 "../ext/nmea.cpp"
-	if ( (*p) == 84 )
+#line 3840 "../ext/nmea.cpp"
+	if ( (*p) == 45 )
 		goto st237;
+	if ( 48 <= (*p) && (*p) <= 57 )
+		goto tr314;
 	goto st0;
 st237:
 	if ( ++p == pe )
 		goto _out237;
 case 237:
-	if ( (*p) == 44 )
-		goto st238;
+	if ( 48 <= (*p) && (*p) <= 57 )
+		goto tr315;
 	goto st0;
+tr314:
+#line 11 "nmea.rl"
+	{
+		current_float = 0;
+		current_digit = current_digit*10 + ((*p) - '0');
+	}
+	goto st238;
+tr315:
+#line 28 "nmea.rl"
+	{sign = -1;}
+#line 11 "nmea.rl"
+	{
+		current_float = 0;
+		current_digit = current_digit*10 + ((*p) - '0');
+	}
+	goto st238;
 st238:
 	if ( ++p == pe )
 		goto _out238;
 case 238:
-	if ( (*p) == 44 )
-		goto st239;
+#line 3873 "../ext/nmea.cpp"
+	if ( (*p) == 46 )
+		goto tr316;
 	if ( 48 <= (*p) && (*p) <= 57 )
-		goto tr302;
+		goto tr314;
 	goto st0;
-tr330:
-#line 4 "nmea.rl"
-	{magnetic_course = current_float; current_float = 0;}
+tr316:
+#line 15 "nmea.rl"
+	{
+		current_frac = 10;
+		current_float = current_digit;
+		current_digit = 0;
+	}
 	goto st239;
 st239:
 	if ( ++p == pe )
 		goto _out239;
 case 239:
-#line 3721 "../ext/nmea.cpp"
-	if ( (*p) == 77 )
-		goto st240;
+#line 3891 "../ext/nmea.cpp"
+	if ( 48 <= (*p) && (*p) <= 57 )
+		goto tr317;
 	goto st0;
+tr317:
+#line 20 "nmea.rl"
+	{
+		current_float += ((*p) - '0')*1.0 / current_frac;
+		current_frac *= 10;
+	}
+	goto st240;
 st240:
 	if ( ++p == pe )
 		goto _out240;
 case 240:
+#line 3906 "../ext/nmea.cpp"
 	if ( (*p) == 44 )
-		goto st241;
+		goto tr318;
+	if ( 48 <= (*p) && (*p) <= 57 )
+		goto tr317;
 	goto st0;
+tr318:
+#line 28 "nmea.rl"
+	{current_float = current_float*sign; sign = 1;}
+	goto st241;
 st241:
 	if ( ++p == pe )
 		goto _out241;
 case 241:
-	if ( (*p) == 44 )
-		goto st242;
-	if ( 48 <= (*p) && (*p) <= 57 )
-		goto tr306;
+#line 3920 "../ext/nmea.cpp"
+	switch( (*p) ) {
+		case 69: goto tr319;
+		case 87: goto tr320;
+	}
 	goto st0;
-tr327:
-#line 5 "nmea.rl"
-	{vtg_knot_speed = current_float; current_float = 0;}
+tr267:
+#line 24 "nmea.rl"
+	{bcd = 10*((*p) - '0');}
 	goto st242;
 st242:
 	if ( ++p == pe )
 		goto _out242;
 case 242:
-#line 3749 "../ext/nmea.cpp"
-	if ( (*p) == 78 )
-		goto st243;
+#line 3934 "../ext/nmea.cpp"
+	if ( 48 <= (*p) && (*p) <= 57 )
+		goto tr321;
 	goto st0;
+tr321:
+#line 24 "nmea.rl"
+	{bcd += (*p) - '0';}
+#line 40 "nmea.rl"
+	{
+		current_degrees = bcd;
+		bcd = 0;
+	}
+	goto st243;
 st243:
 	if ( ++p == pe )
 		goto _out243;
 case 243:
-	if ( (*p) == 44 )
+#line 3951 "../ext/nmea.cpp"
+	if ( (*p) == 45 )
 		goto st244;
+	if ( 48 <= (*p) && (*p) <= 57 )
+		goto tr323;
 	goto st0;
 st244:
 	if ( ++p == pe )
 		goto _out244;
 case 244:
-	if ( (*p) == 44 )
-		goto st245;
 	if ( 48 <= (*p) && (*p) <= 57 )
-		goto tr310;
+		goto tr324;
 	goto st0;
+tr323:
+#line 11 "nmea.rl"
+	{
+		current_float = 0;
+		current_digit = current_digit*10 + ((*p) - '0');
+	}
+	goto st245;
 tr324:
-#line 6 "nmea.rl"
-	{vtg_kmph_speed = current_float; current_float = 0;}
+#line 28 "nmea.rl"
+	{sign = -1;}
+#line 11 "nmea.rl"
+	{
+		current_float = 0;
+		current_digit = current_digit*10 + ((*p) - '0');
+	}
 	goto st245;
 st245:
 	if ( ++p == pe )
 		goto _out245;
 case 245:
-#line 3777 "../ext/nmea.cpp"
-	if ( (*p) == 75 )
-		goto st246;
+#line 3984 "../ext/nmea.cpp"
+	if ( (*p) == 46 )
+		goto tr325;
+	if ( 48 <= (*p) && (*p) <= 57 )
+		goto tr323;
 	goto st0;
+tr325:
+#line 15 "nmea.rl"
+	{
+		current_frac = 10;
+		current_float = current_digit;
+		current_digit = 0;
+	}
+	goto st246;
 st246:
 	if ( ++p == pe )
 		goto _out246;
 case 246:
-	switch( (*p) ) {
-		case 42: goto tr312;
-		case 44: goto st250;
-	}
+#line 4002 "../ext/nmea.cpp"
+	if ( 48 <= (*p) && (*p) <= 57 )
+		goto tr326;
 	goto st0;
-tr312:
-#line 82 "nmea.rl"
-	{sentence_end = p; }
+tr326:
+#line 20 "nmea.rl"
+	{
+		current_float += ((*p) - '0')*1.0 / current_frac;
+		current_frac *= 10;
+	}
 	goto st247;
 st247:
 	if ( ++p == pe )
 		goto _out247;
 case 247:
-#line 3798 "../ext/nmea.cpp"
-	if ( (*p) < 65 ) {
-		if ( 48 <= (*p) && (*p) <= 57 )
-			goto tr314;
-	} else if ( (*p) > 90 ) {
-		if ( 97 <= (*p) && (*p) <= 122 )
-			goto tr314;
-	} else
-		goto tr314;
+#line 4017 "../ext/nmea.cpp"
+	if ( (*p) == 44 )
+		goto tr327;
+	if ( 48 <= (*p) && (*p) <= 57 )
+		goto tr326;
 	goto st0;
-tr314:
-#line 82 "nmea.rl"
-	{checksum[0] = (*p);}
+tr327:
+#line 28 "nmea.rl"
+	{current_float = current_float*sign; sign = 1;}
 	goto st248;
 st248:
 	if ( ++p == pe )
 		goto _out248;
 case 248:
-#line 3816 "../ext/nmea.cpp"
+#line 4031 "../ext/nmea.cpp"
+	switch( (*p) ) {
+		case 78: goto tr328;
+		case 83: goto tr329;
+	}
+	goto st0;
+st249:
+	if ( ++p == pe )
+		goto _out249;
+case 249:
+	if ( 48 <= (*p) && (*p) <= 57 )
+		goto tr330;
+	goto st0;
+tr330:
+#line 11 "nmea.rl"
+	{
+		current_float = 0;
+		current_digit = current_digit*10 + ((*p) - '0');
+	}
+	goto st250;
+st250:
+	if ( ++p == pe )
+		goto _out250;
+case 250:
+#line 4055 "../ext/nmea.cpp"
+	if ( (*p) == 44 )
+		goto tr331;
+	if ( 48 <= (*p) && (*p) <= 57 )
+		goto tr330;
+	goto st0;
+st251:
+	if ( ++p == pe )
+		goto _out251;
+case 251:
+	if ( (*p) == 84 )
+		goto st252;
+	goto st0;
+st252:
+	if ( ++p == pe )
+		goto _out252;
+case 252:
+	if ( (*p) == 71 )
+		goto st253;
+	goto st0;
+st253:
+	if ( ++p == pe )
+		goto _out253;
+case 253:
+	if ( (*p) == 44 )
+		goto st254;
+	goto st0;
+st254:
+	if ( ++p == pe )
+		goto _out254;
+case 254:
+	switch( (*p) ) {
+		case 44: goto st255;
+		case 45: goto st283;
+	}
+	if ( 48 <= (*p) && (*p) <= 57 )
+		goto tr337;
+	goto st0;
+tr379:
+#line 28 "nmea.rl"
+	{current_float = current_float*sign; sign = 1;}
+#line 3 "nmea.rl"
+	{true_course = current_float; current_float = 0;}
+	goto st255;
+st255:
+	if ( ++p == pe )
+		goto _out255;
+case 255:
+#line 4103 "../ext/nmea.cpp"
+	if ( (*p) == 84 )
+		goto st256;
+	goto st0;
+st256:
+	if ( ++p == pe )
+		goto _out256;
+case 256:
+	if ( (*p) == 44 )
+		goto st257;
+	goto st0;
+st257:
+	if ( ++p == pe )
+		goto _out257;
+case 257:
+	switch( (*p) ) {
+		case 44: goto st258;
+		case 45: goto st279;
+	}
+	if ( 48 <= (*p) && (*p) <= 57 )
+		goto tr342;
+	goto st0;
+tr375:
+#line 28 "nmea.rl"
+	{current_float = current_float*sign; sign = 1;}
+#line 4 "nmea.rl"
+	{magnetic_course = current_float; current_float = 0;}
+	goto st258;
+st258:
+	if ( ++p == pe )
+		goto _out258;
+case 258:
+#line 4135 "../ext/nmea.cpp"
+	if ( (*p) == 77 )
+		goto st259;
+	goto st0;
+st259:
+	if ( ++p == pe )
+		goto _out259;
+case 259:
+	if ( (*p) == 44 )
+		goto st260;
+	goto st0;
+st260:
+	if ( ++p == pe )
+		goto _out260;
+case 260:
+	switch( (*p) ) {
+		case 44: goto st261;
+		case 45: goto st275;
+	}
+	if ( 48 <= (*p) && (*p) <= 57 )
+		goto tr347;
+	goto st0;
+tr371:
+#line 28 "nmea.rl"
+	{current_float = current_float*sign; sign = 1;}
+#line 5 "nmea.rl"
+	{vtg_knot_speed = current_float; current_float = 0;}
+	goto st261;
+st261:
+	if ( ++p == pe )
+		goto _out261;
+case 261:
+#line 4167 "../ext/nmea.cpp"
+	if ( (*p) == 78 )
+		goto st262;
+	goto st0;
+st262:
+	if ( ++p == pe )
+		goto _out262;
+case 262:
+	if ( (*p) == 44 )
+		goto st263;
+	goto st0;
+st263:
+	if ( ++p == pe )
+		goto _out263;
+case 263:
+	switch( (*p) ) {
+		case 44: goto st264;
+		case 45: goto st271;
+	}
+	if ( 48 <= (*p) && (*p) <= 57 )
+		goto tr352;
+	goto st0;
+tr367:
+#line 28 "nmea.rl"
+	{current_float = current_float*sign; sign = 1;}
+#line 6 "nmea.rl"
+	{vtg_kmph_speed = current_float; current_float = 0;}
+	goto st264;
+st264:
+	if ( ++p == pe )
+		goto _out264;
+case 264:
+#line 4199 "../ext/nmea.cpp"
+	if ( (*p) == 75 )
+		goto st265;
+	goto st0;
+st265:
+	if ( ++p == pe )
+		goto _out265;
+case 265:
+	switch( (*p) ) {
+		case 42: goto tr354;
+		case 44: goto st269;
+	}
+	goto st0;
+tr354:
+#line 82 "nmea.rl"
+	{sentence_end = p; }
+	goto st266;
+st266:
+	if ( ++p == pe )
+		goto _out266;
+case 266:
+#line 4220 "../ext/nmea.cpp"
 	if ( (*p) < 65 ) {
 		if ( 48 <= (*p) && (*p) <= 57 )
-			goto tr315;
+			goto tr356;
 	} else if ( (*p) > 90 ) {
 		if ( 97 <= (*p) && (*p) <= 122 )
-			goto tr315;
+			goto tr356;
 	} else
-		goto tr315;
+		goto tr356;
 	goto st0;
-tr315:
+tr356:
+#line 82 "nmea.rl"
+	{checksum[0] = (*p);}
+	goto st267;
+st267:
+	if ( ++p == pe )
+		goto _out267;
+case 267:
+#line 4238 "../ext/nmea.cpp"
+	if ( (*p) < 65 ) {
+		if ( 48 <= (*p) && (*p) <= 57 )
+			goto tr357;
+	} else if ( (*p) > 90 ) {
+		if ( 97 <= (*p) && (*p) <= 122 )
+			goto tr357;
+	} else
+		goto tr357;
+	goto st0;
+tr357:
 #line 68 "nmea.rl"
 	{
 		checksum[1] = (*p);
@@ -3838,398 +4260,462 @@ tr315:
 			throw DataError(buf);
 		}
 	}
-	goto st249;
-st249:
-	if ( ++p == pe )
-		goto _out249;
-case 249:
-#line 3847 "../ext/nmea.cpp"
-	switch( (*p) ) {
-		case 10: goto tr316;
-		case 13: goto tr317;
-	}
-	goto st0;
-st250:
-	if ( ++p == pe )
-		goto _out250;
-case 250:
-	switch( (*p) ) {
-		case 65: goto tr318;
-		case 68: goto tr319;
-		case 69: goto tr320;
-		case 78: goto tr321;
-	}
-	goto st0;
-tr318:
-#line 7 "nmea.rl"
-	{vtg_mode = VTG_AUTONOMUS;}
-	goto st251;
-tr319:
-#line 7 "nmea.rl"
-	{vtg_mode = VTG_DIFFERENTIAL;}
-	goto st251;
-tr320:
-#line 7 "nmea.rl"
-	{vtg_mode = VTG_ESTIMATED;}
-	goto st251;
-tr321:
-#line 7 "nmea.rl"
-	{vtg_mode = VTG_INVALID;}
-	goto st251;
-st251:
-	if ( ++p == pe )
-		goto _out251;
-case 251:
-#line 3884 "../ext/nmea.cpp"
-	if ( (*p) == 42 )
-		goto tr312;
-	goto st0;
-tr310:
-#line 11 "nmea.rl"
-	{
-		current_float = 0;
-		current_digit = current_digit*10 + ((*p) - '0');
-	}
-	goto st252;
-st252:
-	if ( ++p == pe )
-		goto _out252;
-case 252:
-#line 3899 "../ext/nmea.cpp"
-	if ( (*p) == 46 )
-		goto tr322;
-	if ( 48 <= (*p) && (*p) <= 57 )
-		goto tr310;
-	goto st0;
-tr322:
-#line 15 "nmea.rl"
-	{
-		current_frac = 10;
-		current_float = current_digit;
-		current_digit = 0;
-	}
-	goto st253;
-st253:
-	if ( ++p == pe )
-		goto _out253;
-case 253:
-#line 3917 "../ext/nmea.cpp"
-	if ( 48 <= (*p) && (*p) <= 57 )
-		goto tr323;
-	goto st0;
-tr323:
-#line 20 "nmea.rl"
-	{
-		current_float += ((*p) - '0')*1.0 / current_frac;
-		current_frac *= 10;
-	}
-	goto st254;
-st254:
-	if ( ++p == pe )
-		goto _out254;
-case 254:
-#line 3932 "../ext/nmea.cpp"
-	if ( (*p) == 44 )
-		goto tr324;
-	if ( 48 <= (*p) && (*p) <= 57 )
-		goto tr323;
-	goto st0;
-tr306:
-#line 11 "nmea.rl"
-	{
-		current_float = 0;
-		current_digit = current_digit*10 + ((*p) - '0');
-	}
-	goto st255;
-st255:
-	if ( ++p == pe )
-		goto _out255;
-case 255:
-#line 3949 "../ext/nmea.cpp"
-	if ( (*p) == 46 )
-		goto tr325;
-	if ( 48 <= (*p) && (*p) <= 57 )
-		goto tr306;
-	goto st0;
-tr325:
-#line 15 "nmea.rl"
-	{
-		current_frac = 10;
-		current_float = current_digit;
-		current_digit = 0;
-	}
-	goto st256;
-st256:
-	if ( ++p == pe )
-		goto _out256;
-case 256:
-#line 3967 "../ext/nmea.cpp"
-	if ( 48 <= (*p) && (*p) <= 57 )
-		goto tr326;
-	goto st0;
-tr326:
-#line 20 "nmea.rl"
-	{
-		current_float += ((*p) - '0')*1.0 / current_frac;
-		current_frac *= 10;
-	}
-	goto st257;
-st257:
-	if ( ++p == pe )
-		goto _out257;
-case 257:
-#line 3982 "../ext/nmea.cpp"
-	if ( (*p) == 44 )
-		goto tr327;
-	if ( 48 <= (*p) && (*p) <= 57 )
-		goto tr326;
-	goto st0;
-tr302:
-#line 11 "nmea.rl"
-	{
-		current_float = 0;
-		current_digit = current_digit*10 + ((*p) - '0');
-	}
-	goto st258;
-st258:
-	if ( ++p == pe )
-		goto _out258;
-case 258:
-#line 3999 "../ext/nmea.cpp"
-	if ( (*p) == 46 )
-		goto tr328;
-	if ( 48 <= (*p) && (*p) <= 57 )
-		goto tr302;
-	goto st0;
-tr328:
-#line 15 "nmea.rl"
-	{
-		current_frac = 10;
-		current_float = current_digit;
-		current_digit = 0;
-	}
-	goto st259;
-st259:
-	if ( ++p == pe )
-		goto _out259;
-case 259:
-#line 4017 "../ext/nmea.cpp"
-	if ( 48 <= (*p) && (*p) <= 57 )
-		goto tr329;
-	goto st0;
-tr329:
-#line 20 "nmea.rl"
-	{
-		current_float += ((*p) - '0')*1.0 / current_frac;
-		current_frac *= 10;
-	}
-	goto st260;
-st260:
-	if ( ++p == pe )
-		goto _out260;
-case 260:
-#line 4032 "../ext/nmea.cpp"
-	if ( (*p) == 44 )
-		goto tr330;
-	if ( 48 <= (*p) && (*p) <= 57 )
-		goto tr329;
-	goto st0;
-tr298:
-#line 11 "nmea.rl"
-	{
-		current_float = 0;
-		current_digit = current_digit*10 + ((*p) - '0');
-	}
-	goto st261;
-st261:
-	if ( ++p == pe )
-		goto _out261;
-case 261:
-#line 4049 "../ext/nmea.cpp"
-	if ( (*p) == 46 )
-		goto tr331;
-	if ( 48 <= (*p) && (*p) <= 57 )
-		goto tr298;
-	goto st0;
-tr331:
-#line 15 "nmea.rl"
-	{
-		current_frac = 10;
-		current_float = current_digit;
-		current_digit = 0;
-	}
-	goto st262;
-st262:
-	if ( ++p == pe )
-		goto _out262;
-case 262:
-#line 4067 "../ext/nmea.cpp"
-	if ( 48 <= (*p) && (*p) <= 57 )
-		goto tr332;
-	goto st0;
-tr332:
-#line 20 "nmea.rl"
-	{
-		current_float += ((*p) - '0')*1.0 / current_frac;
-		current_frac *= 10;
-	}
-	goto st263;
-st263:
-	if ( ++p == pe )
-		goto _out263;
-case 263:
-#line 4082 "../ext/nmea.cpp"
-	if ( (*p) == 44 )
-		goto tr333;
-	if ( 48 <= (*p) && (*p) <= 57 )
-		goto tr332;
-	goto st0;
-st264:
-	if ( ++p == pe )
-		goto _out264;
-case 264:
-	if ( (*p) == 83 )
-		goto st265;
-	goto st0;
-st265:
-	if ( ++p == pe )
-		goto _out265;
-case 265:
-	if ( (*p) == 82 )
-		goto st266;
-	goto st0;
-st266:
-	if ( ++p == pe )
-		goto _out266;
-case 266:
-	if ( (*p) == 70 )
-		goto st267;
-	goto st0;
-st267:
-	if ( ++p == pe )
-		goto _out267;
-case 267:
-	if ( (*p) == 84 )
-		goto st268;
-	goto st0;
+	goto st268;
 st268:
 	if ( ++p == pe )
 		goto _out268;
 case 268:
-	if ( (*p) == 88 )
-		goto st269;
+#line 4269 "../ext/nmea.cpp"
+	switch( (*p) ) {
+		case 10: goto tr358;
+		case 13: goto tr359;
+	}
 	goto st0;
 st269:
 	if ( ++p == pe )
 		goto _out269;
 case 269:
-	if ( (*p) == 84 )
-		goto st270;
+	switch( (*p) ) {
+		case 65: goto tr360;
+		case 68: goto tr361;
+		case 69: goto tr362;
+		case 78: goto tr363;
+	}
 	goto st0;
+tr360:
+#line 7 "nmea.rl"
+	{vtg_mode = VTG_AUTONOMUS;}
+	goto st270;
+tr361:
+#line 7 "nmea.rl"
+	{vtg_mode = VTG_DIFFERENTIAL;}
+	goto st270;
+tr362:
+#line 7 "nmea.rl"
+	{vtg_mode = VTG_ESTIMATED;}
+	goto st270;
+tr363:
+#line 7 "nmea.rl"
+	{vtg_mode = VTG_INVALID;}
+	goto st270;
 st270:
 	if ( ++p == pe )
 		goto _out270;
 case 270:
-	if ( (*p) == 44 )
-		goto st271;
+#line 4306 "../ext/nmea.cpp"
+	if ( (*p) == 42 )
+		goto tr354;
 	goto st0;
 st271:
 	if ( ++p == pe )
 		goto _out271;
 case 271:
-	switch( (*p) ) {
-		case 32: goto st271;
-		case 36: goto tr341;
-		case 42: goto tr341;
-		case 95: goto tr341;
-	}
-	if ( (*p) < 48 ) {
-		if ( (*p) > 13 ) {
-			if ( 44 <= (*p) && (*p) <= 46 )
-				goto tr341;
-		} else if ( (*p) >= 9 )
-			goto st271;
-	} else if ( (*p) > 57 ) {
-		if ( (*p) > 90 ) {
-			if ( 97 <= (*p) && (*p) <= 122 )
-				goto tr341;
-		} else if ( (*p) >= 65 )
-			goto tr341;
-	} else
-		goto tr341;
+	if ( 48 <= (*p) && (*p) <= 57 )
+		goto tr364;
 	goto st0;
-tr341:
-#line 29 "nmea.rl"
+tr352:
+#line 11 "nmea.rl"
 	{
-		*current_s = (*p);
-		current_s++;
-		*current_s = 0;
+		current_float = 0;
+		current_digit = current_digit*10 + ((*p) - '0');
+	}
+	goto st272;
+tr364:
+#line 28 "nmea.rl"
+	{sign = -1;}
+#line 11 "nmea.rl"
+	{
+		current_float = 0;
+		current_digit = current_digit*10 + ((*p) - '0');
 	}
 	goto st272;
 st272:
 	if ( ++p == pe )
 		goto _out272;
 case 272:
-#line 4174 "../ext/nmea.cpp"
-	switch( (*p) ) {
-		case 9: goto tr341;
-		case 10: goto tr342;
-		case 13: goto tr343;
-		case 32: goto tr341;
-		case 36: goto tr341;
-		case 42: goto tr341;
-		case 58: goto tr344;
-		case 95: goto tr341;
-	}
-	if ( (*p) < 48 ) {
-		if ( 44 <= (*p) && (*p) <= 46 )
-			goto tr341;
-	} else if ( (*p) > 57 ) {
-		if ( (*p) > 90 ) {
-			if ( 97 <= (*p) && (*p) <= 122 )
-				goto tr341;
-		} else if ( (*p) >= 65 )
-			goto tr341;
-	} else
-		goto tr341;
+#line 4337 "../ext/nmea.cpp"
+	if ( (*p) == 46 )
+		goto tr365;
+	if ( 48 <= (*p) && (*p) <= 57 )
+		goto tr352;
 	goto st0;
-tr344:
-#line 3 "nmea.rl"
+tr365:
+#line 15 "nmea.rl"
 	{
-		psrf_key = current_string;
-		current_s = current_string; 
-		*current_s = 0;
+		current_frac = 10;
+		current_float = current_digit;
+		current_digit = 0;
 	}
 	goto st273;
 st273:
 	if ( ++p == pe )
 		goto _out273;
 case 273:
-#line 4209 "../ext/nmea.cpp"
+#line 4355 "../ext/nmea.cpp"
+	if ( 48 <= (*p) && (*p) <= 57 )
+		goto tr366;
+	goto st0;
+tr366:
+#line 20 "nmea.rl"
+	{
+		current_float += ((*p) - '0')*1.0 / current_frac;
+		current_frac *= 10;
+	}
+	goto st274;
+st274:
+	if ( ++p == pe )
+		goto _out274;
+case 274:
+#line 4370 "../ext/nmea.cpp"
+	if ( (*p) == 44 )
+		goto tr367;
+	if ( 48 <= (*p) && (*p) <= 57 )
+		goto tr366;
+	goto st0;
+st275:
+	if ( ++p == pe )
+		goto _out275;
+case 275:
+	if ( 48 <= (*p) && (*p) <= 57 )
+		goto tr368;
+	goto st0;
+tr347:
+#line 11 "nmea.rl"
+	{
+		current_float = 0;
+		current_digit = current_digit*10 + ((*p) - '0');
+	}
+	goto st276;
+tr368:
+#line 28 "nmea.rl"
+	{sign = -1;}
+#line 11 "nmea.rl"
+	{
+		current_float = 0;
+		current_digit = current_digit*10 + ((*p) - '0');
+	}
+	goto st276;
+st276:
+	if ( ++p == pe )
+		goto _out276;
+case 276:
+#line 4403 "../ext/nmea.cpp"
+	if ( (*p) == 46 )
+		goto tr369;
+	if ( 48 <= (*p) && (*p) <= 57 )
+		goto tr347;
+	goto st0;
+tr369:
+#line 15 "nmea.rl"
+	{
+		current_frac = 10;
+		current_float = current_digit;
+		current_digit = 0;
+	}
+	goto st277;
+st277:
+	if ( ++p == pe )
+		goto _out277;
+case 277:
+#line 4421 "../ext/nmea.cpp"
+	if ( 48 <= (*p) && (*p) <= 57 )
+		goto tr370;
+	goto st0;
+tr370:
+#line 20 "nmea.rl"
+	{
+		current_float += ((*p) - '0')*1.0 / current_frac;
+		current_frac *= 10;
+	}
+	goto st278;
+st278:
+	if ( ++p == pe )
+		goto _out278;
+case 278:
+#line 4436 "../ext/nmea.cpp"
+	if ( (*p) == 44 )
+		goto tr371;
+	if ( 48 <= (*p) && (*p) <= 57 )
+		goto tr370;
+	goto st0;
+st279:
+	if ( ++p == pe )
+		goto _out279;
+case 279:
+	if ( 48 <= (*p) && (*p) <= 57 )
+		goto tr372;
+	goto st0;
+tr342:
+#line 11 "nmea.rl"
+	{
+		current_float = 0;
+		current_digit = current_digit*10 + ((*p) - '0');
+	}
+	goto st280;
+tr372:
+#line 28 "nmea.rl"
+	{sign = -1;}
+#line 11 "nmea.rl"
+	{
+		current_float = 0;
+		current_digit = current_digit*10 + ((*p) - '0');
+	}
+	goto st280;
+st280:
+	if ( ++p == pe )
+		goto _out280;
+case 280:
+#line 4469 "../ext/nmea.cpp"
+	if ( (*p) == 46 )
+		goto tr373;
+	if ( 48 <= (*p) && (*p) <= 57 )
+		goto tr342;
+	goto st0;
+tr373:
+#line 15 "nmea.rl"
+	{
+		current_frac = 10;
+		current_float = current_digit;
+		current_digit = 0;
+	}
+	goto st281;
+st281:
+	if ( ++p == pe )
+		goto _out281;
+case 281:
+#line 4487 "../ext/nmea.cpp"
+	if ( 48 <= (*p) && (*p) <= 57 )
+		goto tr374;
+	goto st0;
+tr374:
+#line 20 "nmea.rl"
+	{
+		current_float += ((*p) - '0')*1.0 / current_frac;
+		current_frac *= 10;
+	}
+	goto st282;
+st282:
+	if ( ++p == pe )
+		goto _out282;
+case 282:
+#line 4502 "../ext/nmea.cpp"
+	if ( (*p) == 44 )
+		goto tr375;
+	if ( 48 <= (*p) && (*p) <= 57 )
+		goto tr374;
+	goto st0;
+st283:
+	if ( ++p == pe )
+		goto _out283;
+case 283:
+	if ( 48 <= (*p) && (*p) <= 57 )
+		goto tr376;
+	goto st0;
+tr337:
+#line 11 "nmea.rl"
+	{
+		current_float = 0;
+		current_digit = current_digit*10 + ((*p) - '0');
+	}
+	goto st284;
+tr376:
+#line 28 "nmea.rl"
+	{sign = -1;}
+#line 11 "nmea.rl"
+	{
+		current_float = 0;
+		current_digit = current_digit*10 + ((*p) - '0');
+	}
+	goto st284;
+st284:
+	if ( ++p == pe )
+		goto _out284;
+case 284:
+#line 4535 "../ext/nmea.cpp"
+	if ( (*p) == 46 )
+		goto tr377;
+	if ( 48 <= (*p) && (*p) <= 57 )
+		goto tr337;
+	goto st0;
+tr377:
+#line 15 "nmea.rl"
+	{
+		current_frac = 10;
+		current_float = current_digit;
+		current_digit = 0;
+	}
+	goto st285;
+st285:
+	if ( ++p == pe )
+		goto _out285;
+case 285:
+#line 4553 "../ext/nmea.cpp"
+	if ( 48 <= (*p) && (*p) <= 57 )
+		goto tr378;
+	goto st0;
+tr378:
+#line 20 "nmea.rl"
+	{
+		current_float += ((*p) - '0')*1.0 / current_frac;
+		current_frac *= 10;
+	}
+	goto st286;
+st286:
+	if ( ++p == pe )
+		goto _out286;
+case 286:
+#line 4568 "../ext/nmea.cpp"
+	if ( (*p) == 44 )
+		goto tr379;
+	if ( 48 <= (*p) && (*p) <= 57 )
+		goto tr378;
+	goto st0;
+st287:
+	if ( ++p == pe )
+		goto _out287;
+case 287:
+	if ( (*p) == 83 )
+		goto st288;
+	goto st0;
+st288:
+	if ( ++p == pe )
+		goto _out288;
+case 288:
+	if ( (*p) == 82 )
+		goto st289;
+	goto st0;
+st289:
+	if ( ++p == pe )
+		goto _out289;
+case 289:
+	if ( (*p) == 70 )
+		goto st290;
+	goto st0;
+st290:
+	if ( ++p == pe )
+		goto _out290;
+case 290:
+	if ( (*p) == 84 )
+		goto st291;
+	goto st0;
+st291:
+	if ( ++p == pe )
+		goto _out291;
+case 291:
+	if ( (*p) == 88 )
+		goto st292;
+	goto st0;
+st292:
+	if ( ++p == pe )
+		goto _out292;
+case 292:
+	if ( (*p) == 84 )
+		goto st293;
+	goto st0;
+st293:
+	if ( ++p == pe )
+		goto _out293;
+case 293:
+	if ( (*p) == 44 )
+		goto st294;
+	goto st0;
+st294:
+	if ( ++p == pe )
+		goto _out294;
+case 294:
 	switch( (*p) ) {
-		case 10: goto tr346;
-		case 13: goto tr346;
-		case 32: goto st273;
-		case 36: goto tr347;
-		case 42: goto tr347;
-		case 95: goto tr347;
+		case 32: goto st294;
+		case 36: goto tr387;
+		case 42: goto tr387;
+		case 95: goto tr387;
+	}
+	if ( (*p) < 48 ) {
+		if ( (*p) > 13 ) {
+			if ( 44 <= (*p) && (*p) <= 46 )
+				goto tr387;
+		} else if ( (*p) >= 9 )
+			goto st294;
+	} else if ( (*p) > 57 ) {
+		if ( (*p) > 90 ) {
+			if ( 97 <= (*p) && (*p) <= 122 )
+				goto tr387;
+		} else if ( (*p) >= 65 )
+			goto tr387;
+	} else
+		goto tr387;
+	goto st0;
+tr387:
+#line 29 "nmea.rl"
+	{
+		*current_s = (*p);
+		current_s++;
+		*current_s = 0;
+	}
+	goto st295;
+st295:
+	if ( ++p == pe )
+		goto _out295;
+case 295:
+#line 4660 "../ext/nmea.cpp"
+	switch( (*p) ) {
+		case 9: goto tr387;
+		case 10: goto tr388;
+		case 13: goto tr389;
+		case 32: goto tr387;
+		case 36: goto tr387;
+		case 42: goto tr387;
+		case 58: goto tr390;
+		case 95: goto tr387;
+	}
+	if ( (*p) < 48 ) {
+		if ( 44 <= (*p) && (*p) <= 46 )
+			goto tr387;
+	} else if ( (*p) > 57 ) {
+		if ( (*p) > 90 ) {
+			if ( 97 <= (*p) && (*p) <= 122 )
+				goto tr387;
+		} else if ( (*p) >= 65 )
+			goto tr387;
+	} else
+		goto tr387;
+	goto st0;
+tr390:
+#line 3 "nmea.rl"
+	{
+		psrf_key = current_string;
+		current_s = current_string; 
+		*current_s = 0;
+	}
+	goto st296;
+st296:
+	if ( ++p == pe )
+		goto _out296;
+case 296:
+#line 4695 "../ext/nmea.cpp"
+	switch( (*p) ) {
+		case 10: goto tr392;
+		case 13: goto tr392;
+		case 32: goto st296;
+		case 36: goto tr393;
+		case 42: goto tr393;
+		case 95: goto tr393;
 	}
 	if ( (*p) < 48 ) {
 		if ( (*p) > 12 ) {
 			if ( 44 <= (*p) && (*p) <= 46 )
-				goto tr347;
+				goto tr393;
 		} else if ( (*p) >= 9 )
-			goto st273;
+			goto st296;
 	} else if ( (*p) > 58 ) {
 		if ( (*p) > 90 ) {
 			if ( 97 <= (*p) && (*p) <= 122 )
-				goto tr347;
+				goto tr393;
 		} else if ( (*p) >= 65 )
-			goto tr347;
+			goto tr393;
 	} else
-		goto tr347;
+		goto tr393;
 	goto st0;
-tr346:
+tr392:
 #line 9 "nmea.rl"
 	{
 		psrf_value = current_string;
@@ -4240,68 +4726,68 @@ tr346:
 	{
 		handler.psrftxt(psrf_key, psrf_value);
 	}
-	goto st278;
-st278:
+	goto st301;
+st301:
 	if ( ++p == pe )
-		goto _out278;
-case 278:
-#line 4249 "../ext/nmea.cpp"
+		goto _out301;
+case 301:
+#line 4735 "../ext/nmea.cpp"
 	switch( (*p) ) {
-		case 10: goto tr346;
-		case 13: goto tr346;
-		case 32: goto st273;
-		case 36: goto tr347;
-		case 42: goto tr347;
-		case 95: goto tr347;
+		case 10: goto tr392;
+		case 13: goto tr392;
+		case 32: goto st296;
+		case 36: goto tr393;
+		case 42: goto tr393;
+		case 95: goto tr393;
 	}
 	if ( (*p) < 48 ) {
 		if ( (*p) > 12 ) {
 			if ( 44 <= (*p) && (*p) <= 46 )
-				goto tr347;
+				goto tr393;
 		} else if ( (*p) >= 9 )
-			goto st273;
+			goto st296;
 	} else if ( (*p) > 58 ) {
 		if ( (*p) > 90 ) {
 			if ( 97 <= (*p) && (*p) <= 122 )
-				goto tr347;
+				goto tr393;
 		} else if ( (*p) >= 65 )
-			goto tr347;
+			goto tr393;
 	} else
-		goto tr347;
+		goto tr393;
 	goto st0;
-tr347:
+tr393:
 #line 29 "nmea.rl"
 	{
 		*current_s = (*p);
 		current_s++;
 		*current_s = 0;
 	}
-	goto st274;
-st274:
+	goto st297;
+st297:
 	if ( ++p == pe )
-		goto _out274;
-case 274:
-#line 4285 "../ext/nmea.cpp"
+		goto _out297;
+case 297:
+#line 4771 "../ext/nmea.cpp"
 	switch( (*p) ) {
-		case 9: goto tr347;
-		case 10: goto tr348;
-		case 13: goto tr349;
-		case 32: goto tr347;
-		case 36: goto tr347;
-		case 42: goto tr347;
-		case 95: goto tr347;
+		case 9: goto tr393;
+		case 10: goto tr394;
+		case 13: goto tr395;
+		case 32: goto tr393;
+		case 36: goto tr393;
+		case 42: goto tr393;
+		case 95: goto tr393;
 	}
 	if ( (*p) < 48 ) {
 		if ( 44 <= (*p) && (*p) <= 46 )
-			goto tr347;
+			goto tr393;
 	} else if ( (*p) > 58 ) {
 		if ( (*p) > 90 ) {
 			if ( 97 <= (*p) && (*p) <= 122 )
-				goto tr347;
+				goto tr393;
 		} else if ( (*p) >= 65 )
-			goto tr347;
+			goto tr393;
 	} else
-		goto tr347;
+		goto tr393;
 	goto st0;
 	}
 	_out0: cs = 0; goto _out; 
@@ -4323,8 +4809,8 @@ case 274:
 	_out17: cs = 17; goto _out; 
 	_out18: cs = 18; goto _out; 
 	_out19: cs = 19; goto _out; 
-	_out275: cs = 275; goto _out; 
-	_out276: cs = 276; goto _out; 
+	_out298: cs = 298; goto _out; 
+	_out299: cs = 299; goto _out; 
 	_out20: cs = 20; goto _out; 
 	_out21: cs = 21; goto _out; 
 	_out22: cs = 22; goto _out; 
@@ -4509,7 +4995,6 @@ case 274:
 	_out201: cs = 201; goto _out; 
 	_out202: cs = 202; goto _out; 
 	_out203: cs = 203; goto _out; 
-	_out277: cs = 277; goto _out; 
 	_out204: cs = 204; goto _out; 
 	_out205: cs = 205; goto _out; 
 	_out206: cs = 206; goto _out; 
@@ -4523,6 +5008,7 @@ case 274:
 	_out214: cs = 214; goto _out; 
 	_out215: cs = 215; goto _out; 
 	_out216: cs = 216; goto _out; 
+	_out300: cs = 300; goto _out; 
 	_out217: cs = 217; goto _out; 
 	_out218: cs = 218; goto _out; 
 	_out219: cs = 219; goto _out; 
@@ -4580,12 +5066,35 @@ case 274:
 	_out271: cs = 271; goto _out; 
 	_out272: cs = 272; goto _out; 
 	_out273: cs = 273; goto _out; 
-	_out278: cs = 278; goto _out; 
 	_out274: cs = 274; goto _out; 
+	_out275: cs = 275; goto _out; 
+	_out276: cs = 276; goto _out; 
+	_out277: cs = 277; goto _out; 
+	_out278: cs = 278; goto _out; 
+	_out279: cs = 279; goto _out; 
+	_out280: cs = 280; goto _out; 
+	_out281: cs = 281; goto _out; 
+	_out282: cs = 282; goto _out; 
+	_out283: cs = 283; goto _out; 
+	_out284: cs = 284; goto _out; 
+	_out285: cs = 285; goto _out; 
+	_out286: cs = 286; goto _out; 
+	_out287: cs = 287; goto _out; 
+	_out288: cs = 288; goto _out; 
+	_out289: cs = 289; goto _out; 
+	_out290: cs = 290; goto _out; 
+	_out291: cs = 291; goto _out; 
+	_out292: cs = 292; goto _out; 
+	_out293: cs = 293; goto _out; 
+	_out294: cs = 294; goto _out; 
+	_out295: cs = 295; goto _out; 
+	_out296: cs = 296; goto _out; 
+	_out301: cs = 301; goto _out; 
+	_out297: cs = 297; goto _out; 
 
 	_out: {}
 	}
-#line 147 "nmea.rl"
+#line 148 "nmea.rl"
 	if(cs == NMEA_error) {
 		return false;
 	}

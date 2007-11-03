@@ -141,7 +141,7 @@ describe NMEA do
   end
   
   it "should parse good gga" do
-    @handler.should_receive(:gga).once.with(Time.utc(1970, 1, 1, 07, 26, 42, 711), 
+    @handler.should_receive(:gga).once.with(Time.utc(1970, 1, 1, 7, 26, 42, 711), 
       GPS::Latitude.new(55, 46.5395), GPS::Longitude.new(37, 41.2180), :gps, 3, 10.6, 174.3, 14.4, nil, 0)
     NMEA.scan("$GPGGA,072642.711,5546.5395,N,03741.2180,E,1,03,10.6,174.3,M,14.4,M,,0000*68", @handler)
   end

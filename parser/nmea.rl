@@ -25,7 +25,7 @@ namespace NMEA {
 	b3cd = bcd digit @{bcd = bcd*10 + (fc - '0');};
 	b4cd = b3cd digit @{bcd = bcd*10 + (fc - '0');};
 	integer = (digit @add_digit)+ ;
-	number = integer ("." @switch_to_float) (digit @add_digit_after_comma)+;
+	number = ('-' %{sign = -1;}|zlen) integer ("." @switch_to_float) (digit @add_digit_after_comma)+ %{current_float = current_float*sign; sign = 1;};
 	action add_char {
 		*current_s = fc;
 		current_s++;
@@ -91,6 +91,7 @@ namespace NMEA {
 	include "bod.rl";
 	
 	sentence = zlen %sentence_begin rmc %read_rmc | gsv %read_gsv | gsa %read_gsa | gga %read_gga | psrftxt %read_psrftxt | vtg %read_vtg | gll %read_gll | bod %read_bod;
+	// | zda %read_zda;
 	main := sentence newline;
 }%%
 
@@ -101,6 +102,7 @@ bool scan(char *p, Handler& handler) throw (Error) {
 	char *pe;
 	int cs;
 	
+	int sign = 1;
 	int current_digit = 0, current_frac = 0;
 	double current_float = 0;
 	int current_degrees = 0;
