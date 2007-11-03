@@ -18,3 +18,17 @@ class MockHandler
   attr_reader :psrftxt_called
   attr_reader :psrf
 end
+
+class Time
+  def to_s
+    strftime("%a %b %d %H:%M:%S UTC %Y")+" #{tv_usec}"
+  end
+  
+  def inspect
+    strftime("%a %b %d %H:%M:%S UTC %Y")+" #{tv_usec}"
+  end
+  
+  def to_str
+    strftime("%a %b %d %H:%M:%S UTC %Y")+" #{tv_usec}"
+  end
+end

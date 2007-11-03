@@ -47,6 +47,9 @@ module GPS
       "%d %.4f%s" % [degrees.abs, minutes, symbol]
     end
     
+    alias :inspect :to_s
+    alias :to_str :to_s 
+    
     def to_degrees
       "%.6f" % [degrees + minutes/60]
     end

@@ -104,7 +104,7 @@ end
 
 desc "Build binary driver"
 task :build do
-  puts `cd ext; [ -e Makefile ] || ruby extconf.rb; make`
+  puts `make -C parser; cd ext; [ -e Makefile ] || ruby extconf.rb; make`
 end
 
 desc "Rebuild binary driver"

@@ -34,7 +34,7 @@ namespace NMEA {
 	string = space* <: (nmea_char @add_char)*;
 	key_string = space* <: ((nmea_char - [:]) @add_char)+;
 	
-	utc_time = bcd @{ utc.hour = bcd; } bcd @{ utc.minute = bcd;} bcd @{ utc.second = bcd;} ("." b3cd @{ utc.usec = bcd;})? comma;
+	utc_time = bcd @{ utc.hour = bcd; } bcd @{ utc.minute = bcd;} bcd @{ utc.second = bcd;} ("." integer %{ utc.usec = current_digit; current_digit = 0;})? comma;
 	utc_date = bcd @{ utc.day = bcd; } bcd @{ utc.month = bcd;} bcd @{ utc.year = bcd > 70 ? 1900+bcd : 2000+bcd;};
 	
 	action set_degrees {
