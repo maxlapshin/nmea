@@ -54,8 +54,8 @@ end
 @handler = NMEAHandler.new
 @f = File.open(File.dirname(__FILE__)+"/nmea.txt")
 loop do
-  #sentence = SerialPort.try_gets("/dev/tty.usbserial", 4800, 8, 1, SerialPort::NONE)
-  sentence = @f.gets
+  sentence = SerialPort.try_gets("/dev/tty.usbserial", 4800, 8, 1, SerialPort::NONE)
+  #sentence = @f.gets
   #puts sentence
   break unless sentence
   begin
