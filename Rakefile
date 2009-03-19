@@ -6,12 +6,12 @@ require 'rake/packagetask'
 require 'rake/contrib/rubyforgepublisher'
 
 PKG_NAME = "nmea"
-PKG_VERSION = "0.3"
+PKG_VERSION = "0.4"
 PKG_AUTHOR = "Max Lapshin"
 PKG_EMAIL = "max@maxidoors.ru"
-PKG_HOMEPAGE = "http://maxidoors.ru/"
+PKG_HOMEPAGE = "http://github.com/maxlapshin/nmea/"
 PKG_SUMMARY = "NMEA (GPS protocol) parser"
-PKG_SVN = "http://svn.maxidoors.ru/ruby-nmea/"
+PKG_SVN = "git://github.com/maxlapshin/nmea.git"
 PKG_RDOC_OPTS = ['--main=README',
                  '--line-numbers',
                  '--webcvs='+PKG_SVN,
@@ -30,9 +30,7 @@ spec = Gem::Specification.new do |s|
   s.require_path = "lib"
   s.rubyforge_project = PKG_NAME
   s.files = %w(README Rakefile setup.rb init.rb) +
-    Dir.glob("{test}/**/*") + 
-    Dir.glob("ext/**/*.{h,c,cpp,rb,hpp}") +
-    Dir.glob("lib/**/*.rb")
+    Dir.glob("**/*.{h,c,cpp,rb,hpp,rl}") +
   s.test_files = FileList["test/test_*.rb"].to_a
   s.has_rdoc = true
   s.rdoc_options = PKG_RDOC_OPTS
