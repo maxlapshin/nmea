@@ -3,39 +3,9 @@ require 'rake/gempackagetask'
 require 'rake/testtask'
 require 'rake/rdoctask'
 require 'rake/packagetask'
-require 'rake/contrib/rubyforgepublisher'
-
-PKG_NAME = "nmea"
-PKG_VERSION = "0.4"
-PKG_AUTHOR = "Max Lapshin"
-PKG_EMAIL = "max@maxidoors.ru"
-PKG_HOMEPAGE = "http://github.com/maxlapshin/nmea/"
-PKG_SUMMARY = "NMEA (GPS protocol) parser"
-PKG_SVN = "git://github.com/maxlapshin/nmea.git"
-PKG_RDOC_OPTS = ['--main=README',
-                 '--line-numbers',
-                 '--webcvs='+PKG_SVN,
-                 '--charset=utf-8',
-                 '--promiscuous']
 
 
-spec = Gem::Specification.new do |s|
-  s.name = PKG_NAME
-  s.version = PKG_VERSION
-  s.author = PKG_AUTHOR
-  s.email = PKG_EMAIL
-  s.homepage = PKG_HOMEPAGE
-  s.platform = Gem::Platform::RUBY
-  s.summary = PKG_SUMMARY
-  s.require_path = "lib"
-  s.rubyforge_project = PKG_NAME
-  s.files = %w(README Rakefile setup.rb init.rb) +
-    Dir.glob("**/*.{h,c,cpp,rb,hpp,rl}") +
-  s.test_files = FileList["test/test_*.rb"].to_a
-  s.has_rdoc = true
-  s.rdoc_options = PKG_RDOC_OPTS
-  s.extensions << 'ext/extconf.rb'
-end
+spec = eval(File.read(File.dirname(__FILE__)+"/nmea.gemspec"))
 
 Rake::GemPackageTask.new(spec) do |pkg|
   pkg.need_tar = true
@@ -65,11 +35,10 @@ end
 desc "Generate RDoc documentation"
 Rake::RDocTask.new("doc") do |rdoc|
   rdoc.rdoc_dir = 'doc'
-  rdoc.title  = PKG_SUMMARY
+  rdoc.title  = "Nmea"
   rdoc.rdoc_files.include('README')
 #  rdoc.rdoc_files.include('CHANGELOG')
 #  rdoc.rdoc_files.include('TODO')
-  rdoc.options = PKG_RDOC_OPTS
   rdoc.rdoc_files.include "ext/ruby_nmea.c"
 end
 
